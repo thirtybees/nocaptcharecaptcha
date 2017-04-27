@@ -1,0 +1,11 @@
+{
+  "name": "MPCleanUrls",
+  "description": "",
+  "type": "project",
+  "require": {
+    "php": ">=5.4"
+  },
+  "require-dev": {
+    "codeception/codeception": "^2.1"
+  }
+}

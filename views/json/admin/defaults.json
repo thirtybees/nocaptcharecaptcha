@@ -1,0 +1,107 @@
+{
+  "1.5": {
+    "login": {
+      "select": "#login_form .submit",
+      "position": "1",
+      "content": "<br \/>\n<br />\n<p class=\"required text\">\n\t<label for=\"loginCaptcha\" class=\"login-captcha-hideme\" style=\"float: left;margin-left: -200px\">Captcha <sup>*<\/sup><\/label>\n\t<span id=\"loginCaptcha\" class=\"g-recaptcha login-captcha-hideme\" style=\"display: block;float: left;height: 100px\"><\/span>\n<\/p>"
+    },
+    "create": {
+      "select": "#account-creation_form .submit",
+      "position": "1",
+      "content": "<label class=\"create-captcha-hideme\">Captcha: <sup>*<\/sup><\/label>\n<div id=\"createCaptcha\" class=\"g-recaptcha create-captcha-hideme\" style=\"height: 100px\"><\/div>"
+    },
+    "password": {
+      "select": "#form_forgotpassword .submit",
+      "position": "1",
+      "content": "<p class=\"text\">\n\t<label for=\"passwordCaptcha\" class=\"password-captcha-hideme\" style=\"float:left\">Captcha:<\/label>\n\t<span id=\"passwordCaptcha\" class=\"g-recaptcha password-captcha-hideme\" style=\"float:left;display:block;margin-bottom:10px\"><\/span>\n<\/p>"
+    },
+    "contact": {
+      "select": "#submitMessage",
+      "position": "1",
+      "content": "<p class=\"textarea\">\n\t<label for=\"contactCaptcha\" class=\"contact-captcha-hideme\" style=\"float:left\">Captcha<\/label>\n\t<span id=\"contactCaptcha\" class=\"g-recaptcha contact-captcha-hideme\" style=\"display:block;float:left;height:100px\"><\/span>\n<\/p>"
+    },
+    "opclogin": {
+      "select": "#SubmitLogin",
+      "position": "1",
+      "content": "<div style=\"margin-left:40px;margin-bottom:5px;float:left;width:40%;height:120px\">\n\t<label for=\"loginCaptcha\" class=\"login-captcha-hideme\">Captcha:<\/label>\n\t<div id=\"loginCaptcha\" class=\"g-recaptcha login-captcha-hideme\"><\/div><br \/>\n<\/div>"
+    },
+    "opccreate": {
+      "select": "#submitAccount, #submitGuestAccount",
+      "position": "1",
+      "content": "<p class=\"required text\">\n\t<label for=\"createCaptcha\" style=\"float: left\">Captcha: <sup>*<\/sup><\/label>\n\t<span id=\"createCaptcha\" class=\"g-recaptcha create-captcha-hideme\" style=\"display:block;padding: 0 5px;height: 100px;width: 360px;float:left\"><\/span>\n<\/p>"
+    },
+    "css": {
+      "extra": ""
+    }
+  },
+  "1.6": {
+    "login": {
+      "select": "#login_form .submit",
+      "position": "1",
+      "content": "<label class=\"login-captcha-hideme\">Captcha <sup>*<\/sup><\/label>\n<div id=\"loginCaptcha\" class=\"g-recaptcha login-captcha-hideme\"><\/div>\n<br \/>"
+    },
+    "create": {
+      "select": "#account-creation_form .submit",
+      "position": "1",
+      "content": "<label class=\"create-captcha-hideme\">Captcha <sup>*<\/sup><\/label>\n<div id=\"createCaptcha\" class=\"g-recaptcha create-captcha-hideme\"><\/div>\n<br \/>"
+    },
+    "password": {
+      "select": "form#form_forgotpassword:first .submit",
+      "position": "1",
+      "content": "<label class=\"password-captcha-hideme\">Captcha <sup>*</sup></label>\n<div id=\"passwordCaptcha\" class=\"g-recaptcha password-captcha-hideme\"><\/div>\n<br />"
+    },
+    "contact": {
+      "select": "form.contact-form-box:first .submit",
+      "position": "1",
+      "content": "<label class=\"contact-captcha-hideme\">Captcha <sup>*</sup></label>\n<div id=\"contactCaptcha\" class=\"g-recaptcha contact-captcha-hideme\"><\/div>\n<br \/>"
+    },
+    "opclogin": {
+      "select": "#login_form .submit",
+      "position": "1",
+      "content": "<br /><label class=\"login-captcha-hideme\">Captcha<\/label>\n<div id=\"loginCaptcha\" class=\"g-recaptcha login-captcha-hideme\"><\/div>\n<br \/>"
+    },
+    "opccreate": {
+      "select": "#submitAccount, #submitGuestAccount",
+      "position": "1",
+      "content": "<label class=\"create-captcha-hideme\">Captcha <sup>*<\/sup><\/label>\n<div id=\"createCaptcha\" class=\"g-recaptcha create-captcha-hideme\"><\/div>\n<br \/>"
+    },
+    "css": {
+      "extra": ""
+    }
+  },
+  "1.7": {
+    "login": {
+      "select": "#login-form > section div:eq(3)",
+      "position": "2",
+      "content": "<div class=\"form-group row login-captcha-hideme\">\r\n<label class=\"col-md-3 form-control-label required\">\r\nCaptcha\r\n<\/label>\r\n<div class=\"col-md-9\">\r\n<div id=\"loginCaptcha\" class=\"g-recaptcha\"><\/div>\r\n<\/div>\r\n<\/div>"
+    },
+    "create": {
+      "select": "#customer-form > section",
+      "position": "4",
+      "content": "<div class=\"form-group row\">\r\n<label class=\"col-md-3 form-control-label required\">\r\nCaptcha\r\n<\/label>\r\n<div class=\"col-md-9\">\r\n<div id=\"createCaptcha\" class=\"g-recaptcha create-captcha-hideme\"><\/div>\r\n<\/div>\r\n<\/div>"
+    },
+    "password": {
+      "select": "form > section.form-fields",
+      "position": "4",
+      "content": "<div class=\"form-group row\">\r\n<label class=\"col-md-3 form-control-label required\">\r\nCaptcha\r\n<\/label>\r\n<div class=\"col-md-9\">\r\n<div id=\"passwordCaptcha\" class=\"g-recaptcha password-captcha-hideme\"><\/div>\r\n<\/div>\r\n<\/div>"
+    },
+    "contact": {
+      "select": "section.contact-form > form > section.form-fields",
+      "position": "4",
+      "content": "<div class=\"form-group row\">\r\n<label class=\"col-md-3 form-control-label required\">\r\nCaptcha\r\n<\/label>\r\n<div class=\"col-md-9\">\r\n<div id=\"contactCaptcha\" class=\"g-recaptcha contact-captcha-hideme\"><\/div>\r\n<\/div>\r\n<\/div>"
+    },
+    "opclogin": {
+      "select": "#login-form > section div:eq(3)",
+      "position": "2",
+      "content": "<div class=\"form-group row login-captcha-hideme\">\r\n<label class=\"col-md-3 form-control-label required\">\r\nCaptcha\r\n<\/label>\r\n<div class=\"col-md-9\">\r\n<div id=\"loginCaptcha\" class=\"g-recaptcha\"><\/div>\r\n<\/div>\r\n<\/div>"
+    },
+    "opccreate": {
+      "select": "#customer-form > section",
+      "position": "4",
+      "content": "<div class=\"form-group row\">\r\n<label class=\"col-md-3 form-control-label required\">\r\nCaptcha\r\n<\/label>\r\n<div class=\"col-md-9\">\r\n<div id=\"createCaptcha\" class=\"g-recaptcha create-captcha-hideme\"><\/div>\r\n<\/div>\r\n<\/div>"
+    },
+    "css": {
+      "extra": ""
+    }
+  }
+}
