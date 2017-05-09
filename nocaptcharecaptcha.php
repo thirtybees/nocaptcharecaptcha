@@ -157,7 +157,7 @@ class NoCaptchaRecaptcha extends Module
         $sql[] = 'CREATE INDEX id_group ON `'._DB_PREFIX_.bqSQL(RecaptchaGroup::$definition['table']).'` (id_group)';
 
         foreach ($sql as $query) {
-            if (!Db::getInstance()->execute($query)) {
+            if (!Db::getInstance()->execute($query, false)) {
                 return false;
             }
         }

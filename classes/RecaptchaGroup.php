@@ -12,9 +12,9 @@
  * obtain it through the world-wide-web, please send an email
  * to license@thirtybees.com so we can send you a copy immediately.
  *
- *  @author    thirty bees <modules@thirtybees.com>
- *  @copyright 2017 thirty bees
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * @author    thirty bees <modules@thirtybees.com>
+ * @copyright 2017 thirty bees
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
 namespace NoCaptchaRecaptchaModule;
@@ -28,31 +28,30 @@ if (!defined('_TB_VERSION_')) {
  */
 class RecaptchaGroup extends \ObjectModel
 {
-    /** @var int $id_group */
-    public $id_group;
-
-    /** @var bool $captchadisabled */
-    public $captchadisabled;
-
+    // @codingStandardsIgnoreStart
     /**
      * @see ObjectModel::$definition
      */
     public static $definition = [
-        'table' => 'ncrc_group',
-        'primary' => 'id_ncrc_group',
-        'multilang' => true,
-        'fields' => [
-            'id_group' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true, 'default' => '0', 'db_type' => 'INT(11) UNSIGNED'],
-            'captcha_disabled' => ['type' => self::TYPE_BOOL, 'validate' => 'isBool', 'required' => true, 'default' => '0', 'db_type' => 'TINYINT(1)'],
+        'table'     => 'ncrc_group',
+        'primary'   => 'id_ncrc_group',
+        'fields'    => [
+            'id_group'         => ['type' => self::TYPE_INT,  'validate' => 'isUnsignedId', 'required' => true, 'default' => '0', 'db_type' => 'INT(11) UNSIGNED'],
+            'captcha_disabled' => ['type' => self::TYPE_BOOL, 'validate' => 'isBool',       'required' => true, 'default' => '0', 'db_type' => 'TINYINT(1)'],
         ],
     ];
+    /** @var int $id_group */
+    public $id_group;
+    /** @var bool $captchadisabled */
+    public $captchadisabled;
+    // @codingStandardsIgnoreEnd
 
     /**
      * Enable recaptcha for the given range
      *
      * @param array $range RecaptchaGroup IDs
      *
-     * @return bool Indicates whether the captchas have been succesfully enabled
+     * @return bool Indicates whether the captchas have been successfully enabled
      */
     public static function enableCaptchas($range)
     {

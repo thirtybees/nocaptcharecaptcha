@@ -36,10 +36,10 @@ class RecaptchaVisitor extends \ObjectModel
         'table'   => 'ncrc_visitor',
         'primary' => 'id_ncrc_visitor',
         'fields'  => [
-            'email'                  => ['type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => true, 'db_type' => 'VARCHAR(255)'],
-            'captcha_disabled'       => ['type' => self::TYPE_BOOL, 'validate' => 'isBool', 'required' => true, 'default' => '0', 'db_type' => 'TINYINT(1)'],
-            'captcha_failed_attempt' => ['type' => self::TYPE_DATE, 'validate' => 'isDateFormat', 'required' => true, 'default' => '1970-01-01 00:00:00', 'db_type' => 'DATETIME'],
-            'captcha_attempts'       => ['type' => self::TYPE_INT, 'validate' => 'isInt', 'required' => true, 'default' => '0', 'db_type' => 'INT(11) UNSIGNED'],
+            'email'                  => ['type' => self::TYPE_STRING, 'validate' => 'isString',     'required' => true,                                     'db_type' => 'VARCHAR(255)'],
+            'captcha_disabled'       => ['type' => self::TYPE_BOOL,   'validate' => 'isBool',       'required' => true, 'default' => '0',                   'db_type' => 'TINYINT(1)'],
+            'captcha_failed_attempt' => ['type' => self::TYPE_DATE,   'validate' => 'isDateFormat', 'required' => true, 'default' => '1970-01-01 00:00:00', 'db_type' => 'DATETIME'],
+            'captcha_attempts'       => ['type' => self::TYPE_INT,    'validate' => 'isInt',        'required' => true, 'default' => '0',                   'db_type' => 'INT(11) UNSIGNED'],
         ],
     ];
     /** @var string $email */
