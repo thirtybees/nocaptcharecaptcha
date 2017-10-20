@@ -140,9 +140,9 @@ class RecaptchaVisitor extends \ObjectModel
         $success = true;
 
         $sql = new \DbQuery();
-        $sql->select('rc.`captcha_attempts`');
-        $sql->from(\bqSQL(self::$definition['table']), 'rc');
-        $sql->where('rc.`email` = \''.\pSQL($email).'\'');
+        $sql->select('`captcha_attempts`, `id_ncrc_visitor`');
+        $sql->from(\bqSQL(self::$definition['table']));
+        $sql->where('`email` = \''.\pSQL($email).'\'');
 
         $visitor = \Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
         if (empty($visitor)) {
@@ -161,7 +161,7 @@ class RecaptchaVisitor extends \ObjectModel
                 [
                     'captcha_attempts' => (int) $number,
                 ],
-                '`email` = '.(int) $visitor['email']
+                '`id_ncrc_visitor` = '.(int) $visitor['id_ncrc_visitor']
             );
         }
 
