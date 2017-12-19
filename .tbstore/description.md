@@ -1,0 +1,1 @@
+The No Captcha reCaptcha module allows you to protect your forms with reCatchas. This can help stop spam in its tracks, reCaptcha is the leading anti-spam tool that is developed by Google. This module allows you to select theme for the reCaptchas and which forms to enable them on. 
