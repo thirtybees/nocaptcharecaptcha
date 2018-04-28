@@ -12,14 +12,14 @@
  * obtain it through the world-wide-web, please send an email
  * to license@thirtybees.com so we can send you a copy immediately.
  *
- *  @author    thirty bees <modules@thirtybees.com>
- *  @copyright 2017-2018 thirty bees
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * @author    thirty bees <modules@thirtybees.com>
+ * @copyright 2017-2018 thirty bees
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
+use NoCaptchaRecaptchaModule\RecaptchaGroup;
 use NoCaptchaRecaptchaModule\RecaptchaLib;
 use NoCaptchaRecaptchaModule\RecaptchaVisitor;
-use NoCaptchaRecaptchaModule\RecaptchaGroup;
 
 if (!defined('_TB_VERSION_')) {
     exit;
@@ -99,7 +99,7 @@ class NoCaptchaRecaptcha extends Module
     {
         $this->name = 'nocaptcharecaptcha';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.3';
+        $this->version = '1.1.0';
         $this->author = 'thirty bees';
         $this->need_instance = 1;
 
@@ -113,10 +113,10 @@ class NoCaptchaRecaptcha extends Module
             }
 
             $this->moduleUrl = Context::getContext()->link->getAdminLink('AdminModules', true).'&'.http_build_query([
-                'configure' => $this->name,
-                'tab_module' => $this->tab,
-                'module_name' => $this->name,
-            ]);
+                    'configure'   => $this->name,
+                    'tab_module'  => $this->tab,
+                    'module_name' => $this->name,
+                ]);
         }
 
         /**
@@ -171,11 +171,7 @@ class NoCaptchaRecaptcha extends Module
         Configuration::updateGlobalValue(static::ATTEMPTS_HOURS, 0);
         Configuration::updateGlobalValue(static::ATTEMPTS_DAYS, 0);
         Configuration::updateGlobalValue(static::LOGGEDINDISABLE, true);
-        if (version_compare(_PS_VERSION_, '1.6.0.0', '<')) {
-            $this->updateAllValue(static::PS15COMPAT, true);
-        } else {
-            $this->updateAllValue(static::PS15COMPAT, false);
-        }
+        $this->updateAllValue(static::PS15COMPAT, false);
 
         $this->installDefaultHtml();
 
@@ -430,20 +426,13 @@ class NoCaptchaRecaptcha extends Module
     public function manageAuthOverride($login, $create)
     {
         $output = true;
-        $versionDir = version_compare(_PS_VERSION_, '1.7.0.0', '>=') ? '17' : '';
         if ($login || $create) {
             $output &= $this->addOptionalOverride(
                 'AuthController',
-                _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.$versionDir.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'AuthController.php'
+                _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'AuthController.php'
             );
             if (!file_exists(_PS_OVERRIDE_DIR_.'classes/checkout')) {
                 @mkdir(_PS_OVERRIDE_DIR_.'classes/checkout');
-            }
-            if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
-                $output &= $this->addOptionalOverride(
-                    'CheckoutPersonalInformationStep',
-                    _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'classes17'.DIRECTORY_SEPARATOR.'checkout'.DIRECTORY_SEPARATOR.'CheckoutPersonalInformationStep.php'
-                );
             }
             if ($output) {
                 if ($login) {
@@ -475,14 +464,8 @@ class NoCaptchaRecaptcha extends Module
                 try {
                     $result = $this->removeOptionalOverride(
                         'AuthController',
-                        _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.$versionDir.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'AuthController.php'
+                        _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'AuthController.php'
                     );
-                    if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
-                        $result &= $this->removeOptionalOverride(
-                            'CheckoutPersonalInformationStep',
-                            _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'classes17'.DIRECTORY_SEPARATOR.'checkout'.DIRECTORY_SEPARATOR.'CheckoutPersonalInformationStep.php'
-                        );
-                    }
                     if (!$result) {
                         $this->updateAllValue(static::LOGIN, true);
                         $this->updateAllValue(static::CREATE, true);
@@ -516,11 +499,10 @@ class NoCaptchaRecaptcha extends Module
     public function managePasswordOverride($password)
     {
         $output = true;
-        $versionDir = version_compare(_PS_VERSION_, '1.7.0.0', '>=') ? '17' : '';
         if ($password) {
             $output &= $this->addOptionalOverride(
                 'PasswordController',
-                _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.$versionDir.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'PasswordController.php'
+                _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'PasswordController.php'
             );
             if ($output) {
                 if ($password) {
@@ -543,7 +525,7 @@ class NoCaptchaRecaptcha extends Module
                 try {
                     $output &= $this->removeOptionalOverride(
                         'PasswordController',
-                        _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.$versionDir.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'PasswordController.php'
+                        _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'PasswordController.php'
                     );
                     if (!$output) {
                         $this->updateAllValue(static::PASSWORD, true);
@@ -576,11 +558,10 @@ class NoCaptchaRecaptcha extends Module
     public function manageContactOverride($contact)
     {
         $output = true;
-        $versionDir = version_compare(_PS_VERSION_, '1.7.0.0', '>=') ? '17' : '';
         if ($contact) {
             $output &= $this->addOptionalOverride(
                 'ContactController',
-                _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.$versionDir.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'ContactController.php'
+                _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'ContactController.php'
             );
             if ($output) {
                 if ($contact) {
@@ -603,7 +584,7 @@ class NoCaptchaRecaptcha extends Module
                 try {
                     $output &= $this->removeOptionalOverride(
                         'ContactController',
-                        _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.$versionDir.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'ContactController.php'
+                        _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'ContactController.php'
                     );
                     if (!$output) {
                         $this->updateAllValue(static::CONTACT, true);
@@ -629,7 +610,6 @@ class NoCaptchaRecaptcha extends Module
      */
     protected function uninstallOptionalOverrides()
     {
-        $versionDir = version_compare(_PS_VERSION_, '1.7.0.0', '>=') ? '17' : '';
         // Uninstall overrides
         try {
             $this->uninstallAdminLoginOverride();
@@ -639,7 +619,7 @@ class NoCaptchaRecaptcha extends Module
         try {
             if ($this->removeOptionalOverride(
                 'AuthController',
-                _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.$versionDir.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'AuthController.php'
+                _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'AuthController.php'
             )) {
                 return false;
             }
@@ -649,7 +629,7 @@ class NoCaptchaRecaptcha extends Module
         try {
             if ($this->removeOptionalOverride(
                 'PasswordController',
-                _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.$versionDir.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'PasswordController.php'
+                _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'PasswordController.php'
             )) {
                 return false;
             }
@@ -659,7 +639,7 @@ class NoCaptchaRecaptcha extends Module
         try {
             if ($this->removeOptionalOverride(
                 'ContactController',
-                _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.$versionDir.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'ContactController.php'
+                _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'ContactController.php'
             )) {
                 return false;
             }
@@ -723,33 +703,33 @@ class NoCaptchaRecaptcha extends Module
     protected function initNavigation()
     {
         $menu = [
-            static::MENU_SETTINGS => [
-                'short' => $this->l('Settings'),
-                'desc' => $this->l('Module settings'),
-                'href' => $this->moduleUrl.'&menu='.static::MENU_SETTINGS,
+            static::MENU_SETTINGS          => [
+                'short'  => $this->l('Settings'),
+                'desc'   => $this->l('Module settings'),
+                'href'   => $this->moduleUrl.'&menu='.static::MENU_SETTINGS,
                 'active' => false,
-                'icon' => 'icon-cog',
+                'icon'   => 'icon-cog',
             ],
             static::MENU_ADVANCED_SETTINGS => [
-                'short' => $this->l('Advanced settings'),
-                'desc' => $this->l('Advanced module setings'),
-                'href' => $this->moduleUrl.'&menu='.static::MENU_ADVANCED_SETTINGS,
+                'short'  => $this->l('Advanced settings'),
+                'desc'   => $this->l('Advanced module setings'),
+                'href'   => $this->moduleUrl.'&menu='.static::MENU_ADVANCED_SETTINGS,
                 'active' => false,
-                'icon' => 'icon-cogs',
+                'icon'   => 'icon-cogs',
             ],
-            static::MENU_CUSTOMERS => [
-                'short' => $this->l('Customers'),
-                'desc' => $this->l('Customers'),
-                'href' => $this->moduleUrl.'&menu='.static::MENU_CUSTOMERS,
+            static::MENU_CUSTOMERS         => [
+                'short'  => $this->l('Customers'),
+                'desc'   => $this->l('Customers'),
+                'href'   => $this->moduleUrl.'&menu='.static::MENU_CUSTOMERS,
                 'active' => false,
-                'icon' => 'icon-user',
+                'icon'   => 'icon-user',
             ],
-            static::MENU_GROUPS => [
-                'short' => $this->l('Groups'),
-                'desc' => $this->l('Groups'),
-                'href' => $this->moduleUrl.'&menu='.static::MENU_GROUPS,
+            static::MENU_GROUPS            => [
+                'short'  => $this->l('Groups'),
+                'desc'   => $this->l('Groups'),
+                'href'   => $this->moduleUrl.'&menu='.static::MENU_GROUPS,
                 'active' => false,
-                'icon' => 'icon-users',
+                'icon'   => 'icon-users',
             ],
         ];
 
@@ -797,13 +777,13 @@ class NoCaptchaRecaptcha extends Module
 
         $this->context->smarty->assign(
             [
-            'language_iso' => $this->context->language->iso_code,
-            'site_key' => Configuration::get(static::PUBLIC_KEY),
-            'secret_key' => Configuration::get(static::PRIVATE_KEY),
-            'nocaptcharecaptcha_confirm_link' => $this->moduleUrl,
-            'differentDomain' => $domain1 !== $domain2,
-            'domain1' => $domain1,
-            'domain2' => $domain2,
+                'language_iso'                    => $this->context->language->iso_code,
+                'site_key'                        => Configuration::get(static::PUBLIC_KEY),
+                'secret_key'                      => Configuration::get(static::PRIVATE_KEY),
+                'nocaptcharecaptcha_confirm_link' => $this->moduleUrl,
+                'differentDomain'                 => $domain1 !== $domain2,
+                'domain1'                         => $domain1,
+                'domain2'                         => $domain2,
             ]
         );
 
@@ -894,8 +874,8 @@ class NoCaptchaRecaptcha extends Module
 
         $helper->tpl_vars = [
             'fields_value' => $this->getConfigFormValues(),
-            'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id,
+            'languages'    => $this->context->controller->getLanguages(),
+            'id_language'  => $this->context->language->id,
         ];
 
         return $helper->generateForm([$this->getConfigForm()]);
@@ -909,29 +889,29 @@ class NoCaptchaRecaptcha extends Module
         $options = [
             [
                 'id_option' => 1,
-                'name' => 'Light',
+                'name'      => 'Light',
             ],
             [
                 'id_option' => 2,
-                'name' => 'Dark',
+                'name'      => 'Dark',
             ],
         ];
 
         $input = [
             [
-                'type' => 'text',
-                'label' => $this->l('reCAPTCHA site key'),
-                'name' => static::PUBLIC_KEY,
-                'size' => 64,
-                'desc' => $this->l('Used in the Javascript files that are served to users.'),
+                'type'     => 'text',
+                'label'    => $this->l('reCAPTCHA site key'),
+                'name'     => static::PUBLIC_KEY,
+                'size'     => 64,
+                'desc'     => $this->l('Used in the Javascript files that are served to users.'),
                 'required' => true,
             ],
             [
-                'type' => 'text',
-                'label' => $this->l('reCAPTCHA secret key'),
-                'name' => static::PRIVATE_KEY,
-                'desc' => $this->l('Used for communication between the store and Google. Be sure to keep this key a secret.'),
-                'size' => 64,
+                'type'     => 'text',
+                'label'    => $this->l('reCAPTCHA secret key'),
+                'name'     => static::PRIVATE_KEY,
+                'desc'     => $this->l('Used for communication between the store and Google. Be sure to keep this key a secret.'),
+                'size'     => 64,
                 'required' => true,
             ],
             [
@@ -939,83 +919,83 @@ class NoCaptchaRecaptcha extends Module
                 'name' => '',
             ],
             [
-                'type' => 'switch',
-                'label' => $this->l('Customer login'),
-                'name' => static::LOGIN,
+                'type'    => 'switch',
+                'label'   => $this->l('Customer login'),
+                'name'    => static::LOGIN,
                 'is_bool' => true,
-                'values' => [
+                'values'  => [
                     [
-                        'id' => 'active_on',
+                        'id'    => 'active_on',
                         'value' => true,
                         'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
                     ],
                     [
-                        'id' => 'active_off',
+                        'id'    => 'active_off',
                         'value' => false,
                         'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
                     ],
                 ],
             ],
             [
-                'type' => 'text',
-                'label' => $this->l('Login attempts'),
-                'name' => static::ATTEMPTS,
-                'desc' => $this->l('Amount of login attempts before captcha is shown. (0 = always)'),
-                'size' => 10,
-                'class' => 'fixed-width-xl',
+                'type'     => 'text',
+                'label'    => $this->l('Login attempts'),
+                'name'     => static::ATTEMPTS,
+                'desc'     => $this->l('Amount of login attempts before captcha is shown. (0 = always)'),
+                'size'     => 10,
+                'class'    => 'fixed-width-xl',
                 'required' => true,
             ],
             [
-                'type' => 'text',
-                'label' => $this->l('Reset attempts after'),
-                'name' => static::ATTEMPTS_MINS,
-                'desc' => ucfirst(Translate::getAdminTranslation('minutes', 'AdminEmployees')),
-                'hint' => $this->l('0 - 0 - 0 disables time limit'),
-                'size' => 2,
-                'class' => 'fixed-width-sm',
+                'type'     => 'text',
+                'label'    => $this->l('Reset attempts after'),
+                'name'     => static::ATTEMPTS_MINS,
+                'desc'     => ucfirst(Translate::getAdminTranslation('minutes', 'AdminEmployees')),
+                'hint'     => $this->l('0 - 0 - 0 disables time limit'),
+                'size'     => 2,
+                'class'    => 'fixed-width-sm',
                 'required' => true,
             ],
             [
-                'type' => 'text',
-                'name' => static::ATTEMPTS_HOURS,
-                'desc' => Translate::getAdminTranslation('Hours', 'AdminBackup'),
-                'size' => 2,
-                'class' => 'fixed-width-sm',
+                'type'     => 'text',
+                'name'     => static::ATTEMPTS_HOURS,
+                'desc'     => Translate::getAdminTranslation('Hours', 'AdminBackup'),
+                'size'     => 2,
+                'class'    => 'fixed-width-sm',
                 'required' => true,
             ],
             [
-                'type' => 'text',
-                'name' => static::ATTEMPTS_DAYS,
-                'desc' => Translate::getAdminTranslation('Days', 'AdminBackup'),
-                'size' => 3,
-                'class' => 'fixed-width-sm',
+                'type'     => 'text',
+                'name'     => static::ATTEMPTS_DAYS,
+                'desc'     => Translate::getAdminTranslation('Days', 'AdminBackup'),
+                'size'     => 3,
+                'class'    => 'fixed-width-sm',
                 'required' => true,
             ],
             [
-                'type' => 'select',
-                'lang' => true,
-                'label' => $this->l('Theme'),
-                'name' => static::LOGIN_THEME,
-                'desc' => $this->l('Enable captcha and select theme for customer login'),
+                'type'    => 'select',
+                'lang'    => true,
+                'label'   => $this->l('Theme'),
+                'name'    => static::LOGIN_THEME,
+                'desc'    => $this->l('Enable captcha and select theme for customer login'),
                 'options' => [
                     'query' => $options,
-                    'id' => 'id_option',
-                    'name' => 'name',
+                    'id'    => 'id_option',
+                    'name'  => 'name',
                 ],
             ],
             [
-                'type' => 'switch',
-                'label' => $this->l('Disable captcha when user is logged in'),
-                'name' => static::LOGGEDINDISABLE,
+                'type'    => 'switch',
+                'label'   => $this->l('Disable captcha when user is logged in'),
+                'name'    => static::LOGGEDINDISABLE,
                 'is_bool' => true,
-                'values' => [
+                'values'  => [
                     [
-                        'id' => 'active_on',
+                        'id'    => 'active_on',
                         'value' => true,
                         'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
                     ],
                     [
-                        'id' => 'active_off',
+                        'id'    => 'active_off',
                         'value' => false,
                         'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
                     ],
@@ -1026,33 +1006,33 @@ class NoCaptchaRecaptcha extends Module
                 'name' => '',
             ],
             [
-                'type' => 'switch',
-                'label' => $this->l('Register account'),
-                'name' => static::CREATE,
+                'type'    => 'switch',
+                'label'   => $this->l('Register account'),
+                'name'    => static::CREATE,
                 'is_bool' => true,
-                'values' => [
+                'values'  => [
                     [
-                        'id' => 'active_on',
+                        'id'    => 'active_on',
                         'value' => true,
                         'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
                     ],
                     [
-                        'id' => 'active_off',
+                        'id'    => 'active_off',
                         'value' => false,
                         'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
                     ],
                 ],
             ],
             [
-                'type' => 'select',
-                'lang' => true,
-                'label' => $this->l('Theme'),
-                'name' => static::CREATE_THEME,
-                'desc' => $this->l('Enable captcha and select theme for the customer registration page'),
+                'type'    => 'select',
+                'lang'    => true,
+                'label'   => $this->l('Theme'),
+                'name'    => static::CREATE_THEME,
+                'desc'    => $this->l('Enable captcha and select theme for the customer registration page'),
                 'options' => [
                     'query' => $options,
-                    'id' => 'id_option',
-                    'name' => 'name',
+                    'id'    => 'id_option',
+                    'name'  => 'name',
                 ],
             ],
             [
@@ -1060,33 +1040,33 @@ class NoCaptchaRecaptcha extends Module
                 'name' => '',
             ],
             [
-                'type' => 'switch',
-                'label' => $this->l('Contact form'),
-                'name' => static::CONTACT,
+                'type'    => 'switch',
+                'label'   => $this->l('Contact form'),
+                'name'    => static::CONTACT,
                 'is_bool' => true,
-                'values' => [
+                'values'  => [
                     [
-                        'id' => 'active_on',
+                        'id'    => 'active_on',
                         'value' => true,
                         'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
                     ],
                     [
-                        'id' => 'active_off',
+                        'id'    => 'active_off',
                         'value' => false,
                         'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
                     ],
                 ],
             ],
             [
-                'type' => 'select',
-                'lang' => true,
-                'label' => $this->l('Theme'),
-                'name' => static::CONTACT_THEME,
-                'desc' => $this->l('Enable captcha and select theme for the contact form'),
+                'type'    => 'select',
+                'lang'    => true,
+                'label'   => $this->l('Theme'),
+                'name'    => static::CONTACT_THEME,
+                'desc'    => $this->l('Enable captcha and select theme for the contact form'),
                 'options' => [
                     'query' => $options,
-                    'id' => 'id_option',
-                    'name' => 'name',
+                    'id'    => 'id_option',
+                    'name'  => 'name',
                 ],
             ],
             [
@@ -1094,33 +1074,33 @@ class NoCaptchaRecaptcha extends Module
                 'name' => '',
             ],
             [
-                'type' => 'switch',
-                'label' => $this->l('Password forgotten'),
-                'name' => static::PASSWORD,
+                'type'    => 'switch',
+                'label'   => $this->l('Password forgotten'),
+                'name'    => static::PASSWORD,
                 'is_bool' => true,
-                'values' => [
+                'values'  => [
                     [
-                        'id' => 'active_on',
+                        'id'    => 'active_on',
                         'value' => true,
                         'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
                     ],
                     [
-                        'id' => 'active_off',
+                        'id'    => 'active_off',
                         'value' => false,
                         'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
                     ],
                 ],
             ],
             [
-                'type' => 'select',
-                'lang' => true,
-                'label' => $this->l('Theme'),
-                'name' => static::PASSWORD_THEME,
-                'desc' => $this->l('Enable captcha and select theme for the password forgotten form'),
+                'type'    => 'select',
+                'lang'    => true,
+                'label'   => $this->l('Theme'),
+                'name'    => static::PASSWORD_THEME,
+                'desc'    => $this->l('Enable captcha and select theme for the password forgotten form'),
                 'options' => [
                     'query' => $options,
-                    'id' => 'id_option',
-                    'name' => 'name',
+                    'id'    => 'id_option',
+                    'name'  => 'name',
                 ],
             ],
             [
@@ -1128,32 +1108,32 @@ class NoCaptchaRecaptcha extends Module
                 'name' => '',
             ],
             [
-                'type' => 'switch',
-                'label' => $this->l('Back Office login'),
-                'name' => static::ADMINLOGIN,
+                'type'    => 'switch',
+                'label'   => $this->l('Back Office login'),
+                'name'    => static::ADMINLOGIN,
                 'is_bool' => true,
-                'values' => [
+                'values'  => [
                     [
-                        'id' => 'active_on',
+                        'id'    => 'active_on',
                         'value' => true,
                         'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
                     ],
                     [
-                        'id' => 'active_off',
+                        'id'    => 'active_off',
                         'value' => false,
                         'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
                     ],
                 ],
             ],
             [
-                'type' => 'select',
-                'lang' => true,
-                'label' => $this->l('Theme'),
-                'name' => static::ADMINLOGIN_THEME,
+                'type'    => 'select',
+                'lang'    => true,
+                'label'   => $this->l('Theme'),
+                'name'    => static::ADMINLOGIN_THEME,
                 'options' => [
                     'query' => $options,
-                    'id' => 'id_option',
-                    'name' => 'name',
+                    'id'    => 'id_option',
+                    'name'  => 'name',
                 ],
             ],
             [
@@ -1161,20 +1141,20 @@ class NoCaptchaRecaptcha extends Module
                 'name' => '',
             ],
             [
-                'type' => 'switch',
-                'label' => $this->l('Ignore connection problems with Google'),
-                'hint' => $this->l('Do not check captcha if it is not possible to connect with Google'),
+                'type'        => 'switch',
+                'label'       => $this->l('Ignore connection problems with Google'),
+                'hint'        => $this->l('Do not check captcha if it is not possible to connect with Google'),
                 'description' => $this->l('Check PrestaShop\'s logs if the server has connection problems'),
-                'name' => static::GOOGLEIGNORE,
-                'is_bool' => true,
-                'values' => [
+                'name'        => static::GOOGLEIGNORE,
+                'is_bool'     => true,
+                'values'      => [
                     [
-                        'id' => 'active_on',
+                        'id'    => 'active_on',
                         'value' => true,
                         'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
                     ],
                     [
-                        'id' => 'active_off',
+                        'id'    => 'active_off',
                         'value' => false,
                         'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
                     ],
@@ -1186,12 +1166,12 @@ class NoCaptchaRecaptcha extends Module
             'form' => [
                 'legend' => [
                     'title' => Translate::getAdminTranslation('Settings', 'AdminReferrers'),
-                    'icon' => 'icon-cogs',
+                    'icon'  => 'icon-cogs',
                 ],
-                'input' => $input,
+                'input'  => $input,
                 'submit' => [
                     'title' => Translate::getAdminTranslation('Save', 'AdminReferrers'),
-                    'class' => (version_compare(_PS_VERSION_, '1.6', '<') ? 'button' : null),
+                    'class' => 'btn btn-default pull-right',
                 ],
             ],
         ];
@@ -1209,15 +1189,15 @@ class NoCaptchaRecaptcha extends Module
     {
         // jQuery position options
         $jqueryPosOptions = [
-            1 => 'before',
-            2 => 'after',
-            3 => 'prepend',
-            4 => 'append',
-            5 => 'parent before',
-            6 => 'parent after',
-            7 => 'parent prepend',
-            8 => 'parent append',
-            9 => 'parent parent before',
+            1  => 'before',
+            2  => 'after',
+            3  => 'prepend',
+            4  => 'append',
+            5  => 'parent before',
+            6  => 'parent after',
+            7  => 'parent prepend',
+            8  => 'parent append',
+            9  => 'parent parent before',
             10 => 'parent parent after',
             11 => 'parent parent prepend',
             12 => 'parent parent append',
@@ -1226,26 +1206,26 @@ class NoCaptchaRecaptcha extends Module
         // Assign Advanced Settings variables
         $this->context->smarty->assign(
             [
-            static::LOGINPOS => Configuration::get(static::LOGINPOS),
-            static::LOGINSELECT => Configuration::get(static::LOGINSELECT),
-            static::LOGINHTML => Configuration::get(static::LOGINHTML),
-            static::CREATEPOS => Configuration::get(static::CREATEPOS),
-            static::CREATESELECT => Configuration::get(static::CREATESELECT),
-            static::CREATEHTML => Configuration::get(static::CREATEHTML),
-            static::PASSWORDPOS => Configuration::get(static::PASSWORDPOS),
-            static::PASSWORDSELECT => Configuration::get(static::PASSWORDSELECT),
-            static::PASSWORDHTML => Configuration::get(static::PASSWORDHTML),
-            static::CONTACTPOS => Configuration::get(static::CONTACTPOS),
-            static::CONTACTSELECT => Configuration::get(static::CONTACTSELECT),
-            static::CONTACTHTML => Configuration::get(static::CONTACTHTML),
-            static::OPCLOGINPOS => Configuration::get(static::OPCLOGINPOS),
-            static::OPCLOGINSELECT => Configuration::get(static::OPCLOGINSELECT),
-            static::OPCLOGINHTML => Configuration::get(static::OPCLOGINHTML),
-            static::OPCCREATEPOS => Configuration::get(static::OPCCREATEPOS),
-            static::OPCCREATESELECT => Configuration::get(static::OPCCREATESELECT),
-            static::OPCCREATEHTML => Configuration::get(static::OPCCREATEHTML),
-            static::JQUERYOPTS => $jqueryPosOptions,
-            'advancedAction' => $this->moduleUrl.'&token='.Tools::getAdminTokenLite('AdminModules').'&menu='.static::MENU_ADVANCED_SETTINGS,
+                static::LOGINPOS        => Configuration::get(static::LOGINPOS),
+                static::LOGINSELECT     => Configuration::get(static::LOGINSELECT),
+                static::LOGINHTML       => Configuration::get(static::LOGINHTML),
+                static::CREATEPOS       => Configuration::get(static::CREATEPOS),
+                static::CREATESELECT    => Configuration::get(static::CREATESELECT),
+                static::CREATEHTML      => Configuration::get(static::CREATEHTML),
+                static::PASSWORDPOS     => Configuration::get(static::PASSWORDPOS),
+                static::PASSWORDSELECT  => Configuration::get(static::PASSWORDSELECT),
+                static::PASSWORDHTML    => Configuration::get(static::PASSWORDHTML),
+                static::CONTACTPOS      => Configuration::get(static::CONTACTPOS),
+                static::CONTACTSELECT   => Configuration::get(static::CONTACTSELECT),
+                static::CONTACTHTML     => Configuration::get(static::CONTACTHTML),
+                static::OPCLOGINPOS     => Configuration::get(static::OPCLOGINPOS),
+                static::OPCLOGINSELECT  => Configuration::get(static::OPCLOGINSELECT),
+                static::OPCLOGINHTML    => Configuration::get(static::OPCLOGINHTML),
+                static::OPCCREATEPOS    => Configuration::get(static::OPCCREATEPOS),
+                static::OPCCREATESELECT => Configuration::get(static::OPCCREATESELECT),
+                static::OPCCREATEHTML   => Configuration::get(static::OPCCREATEHTML),
+                static::JQUERYOPTS      => $jqueryPosOptions,
+                'advancedAction'        => $this->moduleUrl.'&token='.Tools::getAdminTokenLite('AdminModules').'&menu='.static::MENU_ADVANCED_SETTINGS,
             ]
         );
 
@@ -1306,12 +1286,12 @@ class NoCaptchaRecaptcha extends Module
     {
         $fieldsList = [
             RecaptchaVisitor::$definition['primary'] => ['title' => $this->l('ID'), 'width' => 40],
-            'firstname' => ['title' => $this->l('First name'), 'width' => 'auto'],
-            'lastname' => ['title' => $this->l('Last name'), 'width' => 'auto'],
-            'email' => ['title' => $this->l('Email'), 'width' => 'auto'],
-            'captcha_disabled' => ['title' => $this->l('Captcha disabled'), 'type' => 'bool', 'width' => 'auto', 'active' => 'captcha_disabled', 'ajax' => true],
-            'captcha_failed_attempt' => ['title' => $this->l('Last failed attempt'), 'type' => 'datetime', 'width' => 'auto'],
-            'captcha_attempts' => ['title' => $this->l('Attempts left'), 'type' => 'int', 'width' => 'auto'],
+            'firstname'                              => ['title' => $this->l('First name'), 'width' => 'auto'],
+            'lastname'                               => ['title' => $this->l('Last name'), 'width' => 'auto'],
+            'email'                                  => ['title' => $this->l('Email'), 'width' => 'auto'],
+            'captcha_disabled'                       => ['title' => $this->l('Captcha disabled'), 'type' => 'bool', 'width' => 'auto', 'active' => 'captcha_disabled', 'ajax' => true],
+            'captcha_failed_attempt'                 => ['title' => $this->l('Last failed attempt'), 'type' => 'datetime', 'width' => 'auto'],
+            'captcha_attempts'                       => ['title' => $this->l('Attempts left'), 'type' => 'int', 'width' => 'auto'],
         ];
 
         if (Tools::isSubmit('submitReset'.RecaptchaVisitor::$definition['table'])) {
@@ -1350,7 +1330,7 @@ class NoCaptchaRecaptcha extends Module
         $helperList->list_id = RecaptchaVisitor::$definition['table'];
 
         $helperList->bulk_actions = [
-            'enable_recaptcha' => [
+            'enable_recaptcha'  => [
                 'text' => $this->l('Enable recaptcha'),
                 'icon' => 'icon-check',
             ],
@@ -1444,8 +1424,8 @@ class NoCaptchaRecaptcha extends Module
         $helper->submit_action = 'submit'.$this->name.'editcustomer';
         $helper->currentIndex = AdminController::$currentIndex.'&'.http_build_query(
                 [
-            'configure' => $this->name,
-            'menu' => static::MENU_CUSTOMERS,
+                    'configure' => $this->name,
+                    'menu'      => static::MENU_CUSTOMERS,
                 ]
             );
 
@@ -1453,8 +1433,8 @@ class NoCaptchaRecaptcha extends Module
 
         $helper->tpl_vars = [
             'fields_value' => $this->getCustomerValues((int) Tools::getValue(RecaptchaVisitor::$definition['primary'])),
-            'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id,
+            'languages'    => $this->context->controller->getLanguages(),
+            'id_language'  => $this->context->language->id,
         ];
 
         return $helper->generateForm([$this->getCustomerEditForm()]);
@@ -1469,38 +1449,38 @@ class NoCaptchaRecaptcha extends Module
             'form' => [
                 'legend' => [
                     'title' => $this->l('Edit'),
-                    'icon' => 'icon-globe',
+                    'icon'  => 'icon-globe',
                 ],
-                'input' => [
+                'input'  => [
                     [
                         'type' => 'hidden',
                         'name' => RecaptchaVisitor::$definition['primary'],
                     ],
                     [
-                        'type' => 'text',
-                        'label' => Translate::getAdminTranslation('Last name'),
-                        'name' => 'firstname',
+                        'type'     => 'text',
+                        'label'    => Translate::getAdminTranslation('Last name'),
+                        'name'     => 'firstname',
                         'disabled' => true,
                     ],
                     [
-                        'type' => 'text',
-                        'label' => Translate::getAdminTranslation('Last name'),
-                        'name' => 'lastname',
+                        'type'     => 'text',
+                        'label'    => Translate::getAdminTranslation('Last name'),
+                        'name'     => 'lastname',
                         'disabled' => true,
                     ],
                     [
-                        'type' => 'switch',
-                        'label' => 'Recaptcha '.Translate::getAdminTranslation('Disabled'),
-                        'name' => 'captcha_disabled',
+                        'type'    => 'switch',
+                        'label'   => 'Recaptcha '.Translate::getAdminTranslation('Disabled'),
+                        'name'    => 'captcha_disabled',
                         'is_bool' => true,
-                        'values' => [
+                        'values'  => [
                             [
-                                'id' => 'active_on',
+                                'id'    => 'active_on',
                                 'value' => true,
                                 'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
                             ],
                             [
-                                'id' => 'active_off',
+                                'id'    => 'active_off',
                                 'value' => false,
                                 'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
                             ],
@@ -1540,9 +1520,9 @@ class NoCaptchaRecaptcha extends Module
     {
         $fieldsList = [
             RecaptchaGroup::$definition['primary'] => ['title' => $this->l('ID'), 'width' => 40],
-            'id_group' => ['title' => $this->l('Group ID'), 'width' => 'auto', 'filter_key' => 'rg!id_group'],
-            'name' => ['title' => $this->l('Name'), 'width' => 'auto'],
-            'captcha_disabled' => ['title' => $this->l('Captcha disabled'), 'type' => 'bool', 'width' => 'auto', 'active' => 'captcha_disabled', 'ajax' => true],
+            'id_group'                             => ['title' => $this->l('Group ID'), 'width' => 'auto', 'filter_key' => 'rg!id_group'],
+            'name'                                 => ['title' => $this->l('Name'), 'width' => 'auto'],
+            'captcha_disabled'                     => ['title' => $this->l('Captcha disabled'), 'type' => 'bool', 'width' => 'auto', 'active' => 'captcha_disabled', 'ajax' => true],
         ];
 
         if (Tools::isSubmit('submitReset'.RecaptchaGroup::$definition['table'])) {
@@ -1582,7 +1562,7 @@ class NoCaptchaRecaptcha extends Module
         $helperList->list_id = RecaptchaGroup::$definition['table'];
 
         $helperList->bulk_actions = [
-            'enable_recaptcha' => [
+            'enable_recaptcha'  => [
                 'text' => $this->l('Enable recaptcha'),
                 'icon' => 'icon-check',
             ],
@@ -1669,8 +1649,8 @@ class NoCaptchaRecaptcha extends Module
         $helper->submit_action = 'submit'.$this->name.'editgroup';
         $helper->currentIndex = AdminController::$currentIndex.'&'.http_build_query(
                 [
-                'configure' => $this->name,
-                'menu' => static::MENU_GROUPS,
+                    'configure' => $this->name,
+                    'menu'      => static::MENU_GROUPS,
                 ]
             );
 
@@ -1678,8 +1658,8 @@ class NoCaptchaRecaptcha extends Module
 
         $helper->tpl_vars = [
             'fields_value' => $this->getGroupValues((int) Tools::getValue(RecaptchaGroup::$definition['primary'])),
-            'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id,
+            'languages'    => $this->context->controller->getLanguages(),
+            'id_language'  => $this->context->language->id,
         ];
 
         return $helper->generateForm([$this->getGroupEditForm()]);
@@ -1694,32 +1674,32 @@ class NoCaptchaRecaptcha extends Module
             'form' => [
                 'legend' => [
                     'title' => $this->l('Edit'),
-                    'icon' => 'icon-globe',
+                    'icon'  => 'icon-globe',
                 ],
-                'input' => [
+                'input'  => [
                     [
                         'type' => 'hidden',
                         'name' => RecaptchaGroup::$definition['primary'],
                     ],
                     [
-                        'type' => 'text',
-                        'label' => Translate::getAdminTranslation('Name'),
-                        'name' => 'name',
+                        'type'     => 'text',
+                        'label'    => Translate::getAdminTranslation('Name'),
+                        'name'     => 'name',
                         'disabled' => true,
                     ],
                     [
-                        'type' => 'switch',
-                        'label' => 'Recaptcha '.Translate::getAdminTranslation('Disabled'),
-                        'name' => 'captcha_disabled',
+                        'type'    => 'switch',
+                        'label'   => 'Recaptcha '.Translate::getAdminTranslation('Disabled'),
+                        'name'    => 'captcha_disabled',
                         'is_bool' => true,
-                        'values' => [
+                        'values'  => [
                             [
-                                'id' => 'active_on',
+                                'id'    => 'active_on',
                                 'value' => true,
                                 'label' => Translate::getAdminTranslation('Enabled', 'AdminCarriers'),
                             ],
                             [
-                                'id' => 'active_off',
+                                'id'    => 'active_off',
                                 'value' => false,
                                 'label' => Translate::getAdminTranslation('Disabled', 'AdminCarriers'),
                             ],
@@ -1813,17 +1793,17 @@ class NoCaptchaRecaptcha extends Module
             if (RecaptchaVisitor::toggle($idNoCaptchaRecaptchaVisitor)) {
                 echo json_encode(
                     [
-                    'success' => true,
-                    'text' => Translate::getAdminTranslation('Update successful', 'AdminAccess'),
-                    'message' => Db::getInstance()->getMsgError(),
+                        'success' => true,
+                        'text'    => Translate::getAdminTranslation('Update successful', 'AdminAccess'),
+                        'message' => Db::getInstance()->getMsgError(),
                     ]
                 );
             } else {
                 echo json_encode(
                     [
-                    'success' => false,
-                    'text' => Translate::getAdminTranslation('Update error', 'AdminAccess'),
-                    'message' => Db::getInstance()->getMsgError(),
+                        'success' => false,
+                        'text'    => Translate::getAdminTranslation('Update error', 'AdminAccess'),
+                        'message' => Db::getInstance()->getMsgError(),
                     ]
                 );
             }
@@ -1835,17 +1815,17 @@ class NoCaptchaRecaptcha extends Module
             if (RecaptchaGroup::toggle($idNoCaptchaRecaptchaGroup)) {
                 echo json_encode(
                     [
-                    'success' => true,
-                    'text' => Translate::getAdminTranslation('Update successful', 'AdminAccess'),
-                    'message' => Db::getInstance()->getMsgError(),
+                        'success' => true,
+                        'text'    => Translate::getAdminTranslation('Update successful', 'AdminAccess'),
+                        'message' => Db::getInstance()->getMsgError(),
                     ]
                 );
             } else {
                 echo json_encode(
                     [
-                    'success' => false,
-                    'text' => Translate::getAdminTranslation('Update error', 'AdminAccess'),
-                    'message' => Db::getInstance()->getMsgError(),
+                        'success' => false,
+                        'text'    => Translate::getAdminTranslation('Update error', 'AdminAccess'),
+                        'message' => Db::getInstance()->getMsgError(),
                     ]
                 );
             }
@@ -1859,8 +1839,8 @@ class NoCaptchaRecaptcha extends Module
                 die(json_encode(
                     [
                         'data' => [
-                        'confirmed' => false,
-                        'message' => $this->l('No secret key found. Please enter the secret key first.'),
+                            'confirmed' => false,
+                            'message'   => $this->l('No secret key found. Please enter the secret key first.'),
                         ],
                     ]
                 ));
@@ -1871,8 +1851,8 @@ class NoCaptchaRecaptcha extends Module
                 die(json_encode(
                     [
                         'data' => [
-                        'confirmed' => false,
-                        'message' => $this->l('No captcha token found. Please try again.'),
+                            'confirmed' => false,
+                            'message'   => $this->l('No captcha token found. Please try again.'),
                         ],
                     ]
                 ));
@@ -1886,12 +1866,12 @@ class NoCaptchaRecaptcha extends Module
                     die(json_encode(
                         [
                             'data' => [
-                            'confirmed' => false,
-                            'message' => Translate::getModuleTranslation(
-                                'NoCaptchaRecaptcha',
-                                'The reCAPTCHA secret key is invalid. Please contact the site administrator.',
-                                'configure'
-                            ),
+                                'confirmed' => false,
+                                'message'   => Translate::getModuleTranslation(
+                                    'NoCaptchaRecaptcha',
+                                    'The reCAPTCHA secret key is invalid. Please contact the site administrator.',
+                                    'configure'
+                                ),
                             ],
                         ]
                     ));
@@ -1899,12 +1879,12 @@ class NoCaptchaRecaptcha extends Module
                     die(json_encode(
                         [
                             'data' => [
-                            'confirmed' => false,
-                            'message' => Translate::getModuleTranslation(
-                                'NoCaptchaRecaptcha',
-                                'Unable to connect to Google in order to verify the captcha. Please check your server settings or contact your hosting provider.',
-                                'configure'
-                            ),
+                                'confirmed' => false,
+                                'message'   => Translate::getModuleTranslation(
+                                    'NoCaptchaRecaptcha',
+                                    'Unable to connect to Google in order to verify the captcha. Please check your server settings or contact your hosting provider.',
+                                    'configure'
+                                ),
                             ],
                         ]
                     ));
@@ -1912,12 +1892,12 @@ class NoCaptchaRecaptcha extends Module
                     die(json_encode(
                         [
                             'data' => [
-                            'confirmed' => false,
-                            'message' => Translate::getModuleTranslation(
-                                'NoCaptchaRecaptcha',
-                                'Your captcha was wrong. Please try again.',
-                                'configure'
-                            ),
+                                'confirmed' => false,
+                                'message'   => Translate::getModuleTranslation(
+                                    'NoCaptchaRecaptcha',
+                                    'Your captcha was wrong. Please try again.',
+                                    'configure'
+                                ),
                             ],
                         ]
                     ));
@@ -1926,7 +1906,7 @@ class NoCaptchaRecaptcha extends Module
             die(json_encode(
                 [
                     'data' => [
-                    'confirmed' => true,
+                        'confirmed' => true,
                     ],
                 ]
             ));
@@ -1934,8 +1914,8 @@ class NoCaptchaRecaptcha extends Module
 
         echo json_encode(
             [
-            'success' => false,
-            'text' => Translate::getAdminTranslation('Update error', 'AdminAccess'),
+                'success' => false,
+                'text'    => Translate::getAdminTranslation('Update error', 'AdminAccess'),
             ]
         );
         die();
@@ -2228,8 +2208,8 @@ class NoCaptchaRecaptcha extends Module
                     static::CONTACTSELECT => Configuration::get(static::CONTACTSELECT),
                     static::CONTACTPOS    => Configuration::get(static::CONTACTPOS),
 
-                    static::PS15COMPAT                     => Configuration::get(static::PS15COMPAT),
-                    static::GOOGLEIGNORE                   => Configuration::get(static::GOOGLEIGNORE),
+                    static::PS15COMPAT                          => Configuration::get(static::PS15COMPAT),
+                    static::GOOGLEIGNORE                        => Configuration::get(static::GOOGLEIGNORE),
                     'nocaptcharecaptcha_module_link'            => $this->context->link->getModuleLink($this->name, 'captchaenabled', [], true),
                     'nocaptcharecaptcha_guest_checkout_enabled' => (bool) Configuration::get('PS_GUEST_CHECKOUT_ENABLED'),
                     'nocaptcharecaptcha_show_at_start'          => !empty(Context::getContext()->cookie->email),
@@ -2396,10 +2376,10 @@ class NoCaptchaRecaptcha extends Module
                 Db::getInstance()->insert(
                     bqSQL(RecaptchaVisitor::$definition['table']),
                     [
-                        'email' => pSQL($email),
+                        'email'            => pSQL($email),
                         'captcha_disabled' => false,
                         'captcha_attempts' => (int) $captchaAttempts,
-                        'failed_attempt' => date('Y-m-d H:i:s'),
+                        'failed_attempt'   => date('Y-m-d H:i:s'),
                     ]
                 );
 
@@ -3214,16 +3194,16 @@ class NoCaptchaRecaptcha extends Module
                         $alias = ($definition && !empty($definition['fields'][$filter]['shop'])) ? 'sa' : 'a';
 
                         if ($type == 'int' || $type == 'bool') {
-                            $sqlFilter .= (($checkKey || $key == '`active`') ?  $alias.'.' : '').pSQL($key).' = '.(int) $value.' ';
+                            $sqlFilter .= (($checkKey || $key == '`active`') ? $alias.'.' : '').pSQL($key).' = '.(int) $value.' ';
                         } elseif ($type == 'decimal') {
-                            $sqlFilter .= ($checkKey ?  $alias.'.' : '').pSQL($key).' = '.(float) $value.' ';
+                            $sqlFilter .= ($checkKey ? $alias.'.' : '').pSQL($key).' = '.(float) $value.' ';
                         } elseif ($type == 'select') {
-                            $sqlFilter .= ($checkKey ?  $alias.'.' : '').pSQL($key).' = \''.pSQL($value).'\' ';
+                            $sqlFilter .= ($checkKey ? $alias.'.' : '').pSQL($key).' = \''.pSQL($value).'\' ';
                         } elseif ($type == 'price') {
                             $value = (float) str_replace(',', '.', $value);
-                            $sqlFilter .= ($checkKey ?  $alias.'.' : '').pSQL($key).' = '.pSQL(trim($value)).' ';
+                            $sqlFilter .= ($checkKey ? $alias.'.' : '').pSQL($key).' = '.pSQL(trim($value)).' ';
                         } else {
-                            $sqlFilter .= ($checkKey ?  $alias.'.' : '').pSQL($key).' LIKE \'%'.pSQL(trim($value)).'%\' ';
+                            $sqlFilter .= ($checkKey ? $alias.'.' : '').pSQL($key).' LIKE \'%'.pSQL(trim($value)).'%\' ';
                         }
                     }
 

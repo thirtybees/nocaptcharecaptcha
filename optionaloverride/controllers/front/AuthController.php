@@ -72,10 +72,6 @@ class AuthController extends AuthControllerCore
 
     public function processSubmitAccount()
     {
-        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
-            return;
-        }
-
         if (!Module::isEnabled('NoCaptchaRecaptcha')) {
             return parent::processSubmitAccount();
         }

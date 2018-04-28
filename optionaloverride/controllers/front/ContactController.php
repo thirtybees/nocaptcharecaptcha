@@ -4,10 +4,6 @@ class ContactController extends ContactControllerCore
 {
     public function postProcess()
     {
-        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
-            return;
-        }
-
         if (!Module::isEnabled('NoCaptchaRecaptcha')
             || !@filemtime(_PS_MODULE_DIR_.'nocaptcharecaptcha/nocaptcharecaptcha.php')
         ) {
