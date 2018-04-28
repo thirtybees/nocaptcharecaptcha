@@ -58,22 +58,14 @@
 	window.captchaConfirmed = false;
 
 	function onloadCallback() {
-		console.log(grecaptcha);
 		window.confirmCaptchaId = grecaptcha.render('confirmCaptcha', {
 			'sitekey': $('#NCRC_PUBLIC_KEY').val(),
 			'theme': 'light',
-			'callback': verifyCallback,
-			'error-callback': errorCallback
+			'callback': verifyCallback
 		});
-		console.log('onloadCallback executed');
 	}
 
-	function errorCallback() {
-		console.log('failed to load');
-	};
-
 	function verifyCallback(response) {
-		console.log('token ' + response);
 		$.ajax({
 			url: '{$nocaptcharecaptcha_confirm_link|escape:'javascript':'UTF-8'}',
 			method: 'POST',
@@ -92,9 +84,6 @@
 					$('#confirmationRow').html('<div class="{if $smarty.const._PS_VERSION_|@addcslashes:'\'' < '1.6'}error{else}alert alert-danger{/if}">{l s='Captcha rejected. The secret key could be wrong.' mod='nocaptcharecaptcha' js=1}</div>');
 					window.captchaConfirmed = false;
 				}
-			},
-			error: function (result) {
-				console.log('error');
 			}
 		});
 		$('#recaptcha-token').val(response);
