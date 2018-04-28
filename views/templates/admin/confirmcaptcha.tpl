@@ -58,14 +58,22 @@
 	window.captchaConfirmed = false;
 
 	function onloadCallback() {
+		console.log(grecaptcha);
 		window.confirmCaptchaId = grecaptcha.render('confirmCaptcha', {
 			'sitekey': $('#NCRC_PUBLIC_KEY').val(),
 			'theme': 'light',
 			'callback': verifyCallback,
+			'error-callback': errorCallback
 		});
+		console.log('onloadCallback executed');
 	}
 
+	function errorCallback() {
+		console.log('failed to load');
+	};
+
 	function verifyCallback(response) {
+		console.log('token ' + response);
 		$.ajax({
 			url: '{$nocaptcharecaptcha_confirm_link|escape:'javascript':'UTF-8'}',
 			method: 'POST',
@@ -84,6 +92,9 @@
 					$('#confirmationRow').html('<div class="{if $smarty.const._PS_VERSION_|@addcslashes:'\'' < '1.6'}error{else}alert alert-danger{/if}">{l s='Captcha rejected. The secret key could be wrong.' mod='nocaptcharecaptcha' js=1}</div>');
 					window.captchaConfirmed = false;
 				}
+			},
+			error: function (result) {
+				console.log('error');
 			}
 		});
 		$('#recaptcha-token').val(response);
@@ -102,15 +113,22 @@
 			{/if}
 		});
 		$('#NCRC_PUBLIC_KEY, #NCRC_PRIVATE_KEY').on('change', function () {
+			if ($('#NCRC_PUBLIC_KEY').val() == '' || $('#NCRC_PRIVATE_KEY').val() == '') {
+				return false;
+			}
+
 			window.grecaptcha = null;
 			window.captchaConfirmed = false;
 			$('#confirmCaptcha').empty();
 			$('#sitekeyPlaceholder').text($('#NCRC_PUBLIC_KEY').val());
 			$('#secretkeyPlaceholder').text($('#NCRC_PRIVATE_KEY').val());
-			$('#confirmationRow').html('<div class="{if $smarty.const._PS_VERSION_|@addcslashes:'\'' < '1.6'}info{else}alert alert-info{/if}">{l s='Unknown' mod='nocaptcharecaptcha' js=1}</div>');
+			$('#confirmationRow').html('<div class="{if $smarty.const._PS_VERSION_|@addcslashes:'\'' < '1.6'}info{else}alert alert-info{/if}">{l s='Click the reCAPTCHA checkbox.' mod='nocaptcharecaptcha' js=1}</div>');
 			$.getScript('https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=' + nocaptcharecaptcha_lang_iso);
 		});
 
-		$.getScript('https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=' + nocaptcharecaptcha_lang_iso);
+		if ($('#NCRC_PUBLIC_KEY').val() != '' && $('#NCRC_PRIVATE_KEY').val() != '') {
+			$('#confirmationRow').html('<div class="{if $smarty.const._PS_VERSION_|@addcslashes:'\'' < '1.6'}info{else}alert alert-info{/if}">{l s='Click the reCAPTCHA checkbox.' mod='nocaptcharecaptcha' js=1}</div>');
+			$.getScript('https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=' + nocaptcharecaptcha_lang_iso);
+		}
 	});
 </script>
