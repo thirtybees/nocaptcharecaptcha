@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2017 thirty bees
+ * Copyright (C) 2017-2018 thirty bees
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to license@thirtybees.com so we can send you a copy immediately.
  *
  *  @author    thirty bees <modules@thirtybees.com>
- *  @copyright 2017 thirty bees
+ *  @copyright 2017-2018 thirty bees
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -92,6 +92,8 @@ class NoCaptchaRecaptcha extends Module
 
     /**
      * NoCaptchaRecaptcha constructor.
+     *
+     * @throws PrestaShopException
      */
     public function __construct()
     {
@@ -164,15 +166,15 @@ class NoCaptchaRecaptcha extends Module
 
         $this->syncGroups();
 
-        Configuration::updateGlobalValue(self::ATTEMPTS, 0);
-        Configuration::updateGlobalValue(self::ATTEMPTS_MINS, 0);
-        Configuration::updateGlobalValue(self::ATTEMPTS_HOURS, 0);
-        Configuration::updateGlobalValue(self::ATTEMPTS_DAYS, 0);
-        Configuration::updateGlobalValue(self::LOGGEDINDISABLE, true);
+        Configuration::updateGlobalValue(static::ATTEMPTS, 0);
+        Configuration::updateGlobalValue(static::ATTEMPTS_MINS, 0);
+        Configuration::updateGlobalValue(static::ATTEMPTS_HOURS, 0);
+        Configuration::updateGlobalValue(static::ATTEMPTS_DAYS, 0);
+        Configuration::updateGlobalValue(static::LOGGEDINDISABLE, true);
         if (version_compare(_PS_VERSION_, '1.6.0.0', '<')) {
-            $this->updateAllValue(self::PS15COMPAT, true);
+            $this->updateAllValue(static::PS15COMPAT, true);
         } else {
-            $this->updateAllValue(self::PS15COMPAT, false);
+            $this->updateAllValue(static::PS15COMPAT, false);
         }
 
         $this->installDefaultHtml();
@@ -183,7 +185,10 @@ class NoCaptchaRecaptcha extends Module
     /**
      * Uninstall the module
      *
-     * @return bool Whether the uninstall succeeded
+     * @return bool
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
      */
     public function uninstall()
     {
@@ -196,26 +201,26 @@ class NoCaptchaRecaptcha extends Module
         RecaptchaVisitor::dropDatabase();
         RecaptchaGroup::dropDatabase();
 
-        Configuration::deleteByName(self::PRIVATE_KEY);
-        Configuration::deleteByName(self::PUBLIC_KEY);
-        Configuration::deleteByName(self::CONTACT);
-        Configuration::deleteByName(self::CONTACT_THEME);
-        Configuration::deleteByName(self::PASSWORD);
-        Configuration::deleteByName(self::PASSWORD_THEME);
-        Configuration::deleteByName(self::ATTEMPTS);
-        Configuration::deleteByName(self::LOGIN);
-        Configuration::deleteByName(self::LOGIN_THEME);
-        Configuration::deleteByName(self::ADMINLOGIN_THEME);
-        Configuration::deleteByName(self::CREATE);
-        Configuration::deleteByName(self::CREATE_THEME);
-        Configuration::deleteByName(self::ATTEMPTS);
-        Configuration::deleteByName(self::ATTEMPTS_MINS);
-        Configuration::deleteByName(self::ATTEMPTS_HOURS);
-        Configuration::deleteByName(self::ATTEMPTS_DAYS);
-        Configuration::deleteByName(self::PS15COMPAT);
-        Configuration::deleteByName(self::GOOGLEIGNORE);
-        Configuration::deleteByName(self::LOGGEDINDISABLE);
-        Configuration::deleteByName(self::ADMINLOGIN);
+        Configuration::deleteByName(static::PRIVATE_KEY);
+        Configuration::deleteByName(static::PUBLIC_KEY);
+        Configuration::deleteByName(static::CONTACT);
+        Configuration::deleteByName(static::CONTACT_THEME);
+        Configuration::deleteByName(static::PASSWORD);
+        Configuration::deleteByName(static::PASSWORD_THEME);
+        Configuration::deleteByName(static::ATTEMPTS);
+        Configuration::deleteByName(static::LOGIN);
+        Configuration::deleteByName(static::LOGIN_THEME);
+        Configuration::deleteByName(static::ADMINLOGIN_THEME);
+        Configuration::deleteByName(static::CREATE);
+        Configuration::deleteByName(static::CREATE_THEME);
+        Configuration::deleteByName(static::ATTEMPTS);
+        Configuration::deleteByName(static::ATTEMPTS_MINS);
+        Configuration::deleteByName(static::ATTEMPTS_HOURS);
+        Configuration::deleteByName(static::ATTEMPTS_DAYS);
+        Configuration::deleteByName(static::PS15COMPAT);
+        Configuration::deleteByName(static::GOOGLEIGNORE);
+        Configuration::deleteByName(static::LOGGEDINDISABLE);
+        Configuration::deleteByName(static::ADMINLOGIN);
 
         $this->uninstallDefaultHtml();
         $this->uninstallAdminLoginOverride();
@@ -236,33 +241,35 @@ class NoCaptchaRecaptcha extends Module
      * Install the default HTML for all store contexts
      *
      * @return bool Whether the install succeeded
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function installDefaultHtml()
     {
         $defaultsJson = json_decode(
-            Tools::file_get_contents(_PS_MODULE_DIR_.$this->name.'/views/json/admin/defaults.json')
+            file_get_contents(_PS_MODULE_DIR_.$this->name.'/views/json/admin/defaults.json')
         );
-        $shortVersion = Tools::substr(_PS_VERSION_, 0, 3);
+        $shortVersion = substr(_PS_VERSION_, 0, 3);
         $defaultsJson = $defaultsJson->{$shortVersion};
 
-        $this->updateAllValue(self::LOGINSELECT, $defaultsJson->login->select);
-        $this->updateAllValue(self::LOGINPOS, $defaultsJson->login->position);
-        $this->updateAllValue(self::LOGINHTML, $this->unescapeJsonHtml($defaultsJson->login->content), true);
-        $this->updateAllValue(self::CREATESELECT, $defaultsJson->create->select);
-        $this->updateAllValue(self::CREATEPOS, $defaultsJson->create->position);
-        $this->updateAllValue(self::CREATEHTML, $this->unescapeJsonHtml($defaultsJson->create->content), true);
-        $this->updateAllValue(self::PASSWORDSELECT, $defaultsJson->password->select);
-        $this->updateAllValue(self::PASSWORDPOS, $defaultsJson->password->position);
-        $this->updateAllValue(self::PASSWORDHTML, $this->unescapeJsonHtml($defaultsJson->password->content), true);
-        $this->updateAllValue(self::CONTACTSELECT, $defaultsJson->contact->select);
-        $this->updateAllValue(self::CONTACTPOS, $defaultsJson->contact->position);
-        $this->updateAllValue(self::CONTACTHTML, $this->unescapeJsonHtml($defaultsJson->contact->content), true);
-        $this->updateAllValue(self::OPCLOGINSELECT, $defaultsJson->opclogin->select);
-        $this->updateAllValue(self::OPCLOGINPOS, $defaultsJson->opclogin->position);
-        $this->updateAllValue(self::OPCLOGINHTML, $this->unescapeJsonHtml($defaultsJson->opclogin->content), true);
-        $this->updateAllValue(self::OPCCREATESELECT, $defaultsJson->opccreate->select);
-        $this->updateAllValue(self::OPCCREATEPOS, $defaultsJson->opccreate->position);
-        $this->updateAllValue(self::OPCCREATEHTML, $this->unescapeJsonHtml($defaultsJson->opccreate->content), true);
+        $this->updateAllValue(static::LOGINSELECT, $defaultsJson->login->select);
+        $this->updateAllValue(static::LOGINPOS, $defaultsJson->login->position);
+        $this->updateAllValue(static::LOGINHTML, $this->unescapeJsonHtml($defaultsJson->login->content), true);
+        $this->updateAllValue(static::CREATESELECT, $defaultsJson->create->select);
+        $this->updateAllValue(static::CREATEPOS, $defaultsJson->create->position);
+        $this->updateAllValue(static::CREATEHTML, $this->unescapeJsonHtml($defaultsJson->create->content), true);
+        $this->updateAllValue(static::PASSWORDSELECT, $defaultsJson->password->select);
+        $this->updateAllValue(static::PASSWORDPOS, $defaultsJson->password->position);
+        $this->updateAllValue(static::PASSWORDHTML, $this->unescapeJsonHtml($defaultsJson->password->content), true);
+        $this->updateAllValue(static::CONTACTSELECT, $defaultsJson->contact->select);
+        $this->updateAllValue(static::CONTACTPOS, $defaultsJson->contact->position);
+        $this->updateAllValue(static::CONTACTHTML, $this->unescapeJsonHtml($defaultsJson->contact->content), true);
+        $this->updateAllValue(static::OPCLOGINSELECT, $defaultsJson->opclogin->select);
+        $this->updateAllValue(static::OPCLOGINPOS, $defaultsJson->opclogin->position);
+        $this->updateAllValue(static::OPCLOGINHTML, $this->unescapeJsonHtml($defaultsJson->opclogin->content), true);
+        $this->updateAllValue(static::OPCCREATESELECT, $defaultsJson->opccreate->select);
+        $this->updateAllValue(static::OPCCREATEPOS, $defaultsJson->opccreate->position);
+        $this->updateAllValue(static::OPCCREATEHTML, $this->unescapeJsonHtml($defaultsJson->opccreate->content), true);
 
         file_put_contents($this->local_path.'views/css/extra.css', $defaultsJson->css->extra);
 
@@ -273,27 +280,29 @@ class NoCaptchaRecaptcha extends Module
      * Uninstall all HTML fields
      *
      * @return bool Whether the removal succeeded
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function uninstallDefaultHtml()
     {
-        Configuration::deleteByName(self::LOGINSELECT);
-        Configuration::deleteByName(self::LOGINPOS);
-        Configuration::deleteByName(self::LOGINHTML);
-        Configuration::deleteByName(self::CREATESELECT);
-        Configuration::deleteByName(self::CREATEPOS);
-        Configuration::deleteByName(self::CREATEHTML);
-        Configuration::deleteByName(self::PASSWORDSELECT);
-        Configuration::deleteByName(self::PASSWORDPOS);
-        Configuration::deleteByName(self::PASSWORDHTML);
-        Configuration::deleteByName(self::CONTACTSELECT);
-        Configuration::deleteByName(self::CONTACTPOS);
-        Configuration::deleteByName(self::CONTACTHTML);
-        Configuration::deleteByName(self::OPCLOGINSELECT);
-        Configuration::deleteByName(self::OPCLOGINPOS);
-        Configuration::deleteByName(self::OPCLOGINHTML);
-        Configuration::deleteByName(self::OPCCREATESELECT);
-        Configuration::deleteByName(self::OPCCREATEPOS);
-        Configuration::deleteByName(self::OPCCREATEHTML);
+        Configuration::deleteByName(static::LOGINSELECT);
+        Configuration::deleteByName(static::LOGINPOS);
+        Configuration::deleteByName(static::LOGINHTML);
+        Configuration::deleteByName(static::CREATESELECT);
+        Configuration::deleteByName(static::CREATEPOS);
+        Configuration::deleteByName(static::CREATEHTML);
+        Configuration::deleteByName(static::PASSWORDSELECT);
+        Configuration::deleteByName(static::PASSWORDPOS);
+        Configuration::deleteByName(static::PASSWORDHTML);
+        Configuration::deleteByName(static::CONTACTSELECT);
+        Configuration::deleteByName(static::CONTACTPOS);
+        Configuration::deleteByName(static::CONTACTHTML);
+        Configuration::deleteByName(static::OPCLOGINSELECT);
+        Configuration::deleteByName(static::OPCLOGINPOS);
+        Configuration::deleteByName(static::OPCLOGINHTML);
+        Configuration::deleteByName(static::OPCCREATESELECT);
+        Configuration::deleteByName(static::OPCCREATEPOS);
+        Configuration::deleteByName(static::OPCCREATEHTML);
 
         return true;
     }
@@ -302,6 +311,9 @@ class NoCaptchaRecaptcha extends Module
      * Install Admin Login override
      *
      * @return void
+     * @throws Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function installAdminLoginOverride()
     {
@@ -313,7 +325,7 @@ class NoCaptchaRecaptcha extends Module
         );
 
         if (!$result) {
-            $this->updateAllValue(self::ADMINLOGIN, false);
+            $this->updateAllValue(static::ADMINLOGIN, false);
 
             return;
         }
@@ -321,7 +333,7 @@ class NoCaptchaRecaptcha extends Module
         $targetDir = _PS_OVERRIDE_DIR_.'controllers/admin';
         if (!file_exists($targetDir)) {
             if (!mkdir($targetDir)) {
-                $this->updateAllValue(self::ADMINLOGIN, false);
+                $this->updateAllValue(static::ADMINLOGIN, false);
 
                 $this->addError($this->l(sprintf($this->l('Couldn\'t create directory: %s'), $targetDir)), true);
 
@@ -331,7 +343,7 @@ class NoCaptchaRecaptcha extends Module
         $targetDir = _PS_OVERRIDE_DIR_.'controllers/admin/templates';
         if (!file_exists($targetDir)) {
             if (!mkdir($targetDir)) {
-                $this->updateAllValue(self::ADMINLOGIN, false);
+                $this->updateAllValue(static::ADMINLOGIN, false);
 
                 $this->addError($this->l(sprintf($this->l('Couldn\'t create directory: %s'), $targetDir)), true);
 
@@ -341,7 +353,7 @@ class NoCaptchaRecaptcha extends Module
         $targetDir = _PS_OVERRIDE_DIR_.'controllers/admin/templates/login';
         if (!file_exists($targetDir)) {
             if (!mkdir($targetDir)) {
-                $this->updateAllValue(self::ADMINLOGIN, false);
+                $this->updateAllValue(static::ADMINLOGIN, false);
 
                 $this->addError($this->l(sprintf($this->l('Couldn\'t create directory: %s'), $targetDir)), true);
 
@@ -349,7 +361,7 @@ class NoCaptchaRecaptcha extends Module
             }
         }
         if (!copy($sourceTpl, $targetTpl)) {
-            $this->updateAllValue(self::ADMINLOGIN, false);
+            $this->updateAllValue(static::ADMINLOGIN, false);
 
             $this->addError(
                 sprintf(
@@ -362,7 +374,7 @@ class NoCaptchaRecaptcha extends Module
 
             return;
         }
-        $this->updateAllValue(self::ADMINLOGIN, true);
+        $this->updateAllValue(static::ADMINLOGIN, true);
 
         return;
     }
@@ -371,6 +383,9 @@ class NoCaptchaRecaptcha extends Module
      * Uninstall Admin Login override
      *
      * @return void
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
      */
     public function uninstallAdminLoginOverride()
     {
@@ -382,7 +397,7 @@ class NoCaptchaRecaptcha extends Module
         );
 
         if (!$result) {
-            $this->updateAllValue(self::ADMINLOGIN, true);
+            $this->updateAllValue(static::ADMINLOGIN, true);
 
             return;
         }
@@ -395,7 +410,7 @@ class NoCaptchaRecaptcha extends Module
             }
         }
 
-        $this->updateAllValue(self::ADMINLOGIN, false);
+        $this->updateAllValue(static::ADMINLOGIN, false);
 
         return;
     }
@@ -408,6 +423,9 @@ class NoCaptchaRecaptcha extends Module
      * @param bool $create Whether the register captcha should be enable for the current shop
      *
      * @return bool
+     * @throws Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function manageAuthOverride($login, $create)
     {
@@ -429,26 +447,26 @@ class NoCaptchaRecaptcha extends Module
             }
             if ($output) {
                 if ($login) {
-                    Configuration::updateValue(self::LOGIN, $login);
+                    Configuration::updateValue(static::LOGIN, $login);
                 }
                 if ($create) {
-                    Configuration::updateValue(self::CREATE, $create);
+                    Configuration::updateValue(static::CREATE, $create);
                 }
             } else {
-                $this->updateAllValue(self::LOGIN, false);
-                $this->updateAllValue(self::CREATE, false);
+                $this->updateAllValue(static::LOGIN, false);
+                $this->updateAllValue(static::CREATE, false);
             }
         } else {
-            Configuration::updateValue(self::LOGIN, false);
-            Configuration::updateValue(self::CREATE, false);
+            Configuration::updateValue(static::LOGIN, false);
+            Configuration::updateValue(static::CREATE, false);
 
             $active = false;
             foreach (Shop::getShops() as $shop) {
-                if (Configuration::get(self::LOGIN, null, $shop['id_shop_group'], $shop['id_shop'])) {
+                if (Configuration::get(static::LOGIN, null, $shop['id_shop_group'], $shop['id_shop'])) {
                     $active = true;
                     break;
                 }
-                if (Configuration::get(self::CREATE, null, $shop['id_shop_group'], $shop['id_shop'])) {
+                if (Configuration::get(static::CREATE, null, $shop['id_shop_group'], $shop['id_shop'])) {
                     $active = true;
                     break;
                 }
@@ -466,8 +484,8 @@ class NoCaptchaRecaptcha extends Module
                         );
                     }
                     if (!$result) {
-                        $this->updateAllValue(self::LOGIN, true);
-                        $this->updateAllValue(self::CREATE, true);
+                        $this->updateAllValue(static::LOGIN, true);
+                        $this->updateAllValue(static::CREATE, true);
                     }
                     $output &= $result;
                 } catch (Exception $e) {
@@ -491,6 +509,9 @@ class NoCaptchaRecaptcha extends Module
      * @param string $password Whether the password captcha should be enabled for this shop
      *
      * @return bool
+     * @throws Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function managePasswordOverride($password)
     {
@@ -503,17 +524,17 @@ class NoCaptchaRecaptcha extends Module
             );
             if ($output) {
                 if ($password) {
-                    Configuration::updateValue(self::PASSWORD, true);
+                    Configuration::updateValue(static::PASSWORD, true);
                 }
             } else {
-                $this->updateAllValue(self::PASSWORD, false);
+                $this->updateAllValue(static::PASSWORD, false);
             }
         } else {
-            Configuration::updateValue(self::PASSWORD, false);
+            Configuration::updateValue(static::PASSWORD, false);
 
             $active = false;
             foreach (Shop::getShops() as $shop) {
-                if (Configuration::get(self::PASSWORD, null, $shop['id_shop_group'], $shop['id_shop'])) {
+                if (Configuration::get(static::PASSWORD, null, $shop['id_shop_group'], $shop['id_shop'])) {
                     $active = true;
                     break;
                 }
@@ -525,7 +546,7 @@ class NoCaptchaRecaptcha extends Module
                         _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.$versionDir.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'PasswordController.php'
                     );
                     if (!$output) {
-                        $this->updateAllValue(self::PASSWORD, true);
+                        $this->updateAllValue(static::PASSWORD, true);
                     }
                 } catch (Exception $e) {
                     $msg = $e->getMessage();
@@ -548,6 +569,9 @@ class NoCaptchaRecaptcha extends Module
      * @param string $contact Whether the contact captcha should be enabled for this shop
      *
      * @return bool
+     * @throws Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function manageContactOverride($contact)
     {
@@ -560,17 +584,17 @@ class NoCaptchaRecaptcha extends Module
             );
             if ($output) {
                 if ($contact) {
-                    Configuration::updateValue(self::CONTACT, true);
+                    Configuration::updateValue(static::CONTACT, true);
                 }
             } else {
-                $this->updateAllValue(self::CONTACT, false);
+                $this->updateAllValue(static::CONTACT, false);
             }
         } else {
-            Configuration::updateValue(self::CONTACT, false);
+            Configuration::updateValue(static::CONTACT, false);
 
             $active = false;
             foreach (Shop::getShops() as $shop) {
-                if (Configuration::get(self::CONTACT, null, $shop['id_shop_group'], $shop['id_shop'])) {
+                if (Configuration::get(static::CONTACT, null, $shop['id_shop_group'], $shop['id_shop'])) {
                     $active = true;
                     break;
                 }
@@ -582,7 +606,7 @@ class NoCaptchaRecaptcha extends Module
                         _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.$versionDir.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'ContactController.php'
                     );
                     if (!$output) {
-                        $this->updateAllValue(self::CONTACT, true);
+                        $this->updateAllValue(static::CONTACT, true);
                     }
                 } catch (Exception $e) {
                     $msg = $e->getMessage();
@@ -598,6 +622,11 @@ class NoCaptchaRecaptcha extends Module
         return $output;
     }
 
+    /**
+     * @return bool
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
     protected function uninstallOptionalOverrides()
     {
         $versionDir = version_compare(_PS_VERSION_, '1.7.0.0', '>=') ? '17' : '';
@@ -637,14 +666,20 @@ class NoCaptchaRecaptcha extends Module
         } catch (Exception $e) {
         }
 
-        $this->updateAllValue(self::LOGIN, false);
-        $this->updateAllValue(self::CREATE, false);
-        $this->updateAllValue(self::PASSWORD, false);
-        $this->updateAllValue(self::CONTACT, false);
+        $this->updateAllValue(static::LOGIN, false);
+        $this->updateAllValue(static::CREATE, false);
+        $this->updateAllValue(static::PASSWORD, false);
+        $this->updateAllValue(static::CONTACT, false);
     }
 
     /**
      * Load the configuration form
+     *
+     * @return string
+     * @throws Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     public function getContent()
     {
@@ -667,14 +702,14 @@ class NoCaptchaRecaptcha extends Module
         $output = $this->display(__FILE__, 'views/templates/admin/navbar.tpl');
 
         switch (Tools::getValue('menu')) {
-            case self::MENU_ADVANCED_SETTINGS:
+            case static::MENU_ADVANCED_SETTINGS:
                 return $output.$this->renderAdvancedSettingsPage();
-            case self::MENU_CUSTOMERS:
+            case static::MENU_CUSTOMERS:
                 return $output.$this->renderCustomersPage();
-            case self::MENU_GROUPS:
+            case static::MENU_GROUPS:
                 return $output.$this->renderGroupsPage();
             default:
-                $this->menu = self::MENU_SETTINGS;
+                $this->menu = static::MENU_SETTINGS;
 
                 return $output.$this->renderSettingsPage();
         }
@@ -688,52 +723,52 @@ class NoCaptchaRecaptcha extends Module
     protected function initNavigation()
     {
         $menu = [
-            self::MENU_SETTINGS => [
+            static::MENU_SETTINGS => [
                 'short' => $this->l('Settings'),
                 'desc' => $this->l('Module settings'),
-                'href' => $this->moduleUrl.'&menu='.self::MENU_SETTINGS,
+                'href' => $this->moduleUrl.'&menu='.static::MENU_SETTINGS,
                 'active' => false,
                 'icon' => 'icon-cog',
             ],
-            self::MENU_ADVANCED_SETTINGS => [
+            static::MENU_ADVANCED_SETTINGS => [
                 'short' => $this->l('Advanced settings'),
                 'desc' => $this->l('Advanced module setings'),
-                'href' => $this->moduleUrl.'&menu='.self::MENU_ADVANCED_SETTINGS,
+                'href' => $this->moduleUrl.'&menu='.static::MENU_ADVANCED_SETTINGS,
                 'active' => false,
                 'icon' => 'icon-cogs',
             ],
-            self::MENU_CUSTOMERS => [
+            static::MENU_CUSTOMERS => [
                 'short' => $this->l('Customers'),
                 'desc' => $this->l('Customers'),
-                'href' => $this->moduleUrl.'&menu='.self::MENU_CUSTOMERS,
+                'href' => $this->moduleUrl.'&menu='.static::MENU_CUSTOMERS,
                 'active' => false,
                 'icon' => 'icon-user',
             ],
-            self::MENU_GROUPS => [
+            static::MENU_GROUPS => [
                 'short' => $this->l('Groups'),
                 'desc' => $this->l('Groups'),
-                'href' => $this->moduleUrl.'&menu='.self::MENU_GROUPS,
+                'href' => $this->moduleUrl.'&menu='.static::MENU_GROUPS,
                 'active' => false,
                 'icon' => 'icon-users',
             ],
         ];
 
         switch (Tools::getValue('menu')) {
-            case self::MENU_ADVANCED_SETTINGS:
-                $this->menu = self::MENU_ADVANCED_SETTINGS;
-                $menu[self::MENU_ADVANCED_SETTINGS]['active'] = true;
+            case static::MENU_ADVANCED_SETTINGS:
+                $this->menu = static::MENU_ADVANCED_SETTINGS;
+                $menu[static::MENU_ADVANCED_SETTINGS]['active'] = true;
                 break;
-            case self::MENU_CUSTOMERS:
-                $this->menu = self::MENU_CUSTOMERS;
-                $menu[self::MENU_CUSTOMERS]['active'] = true;
+            case static::MENU_CUSTOMERS:
+                $this->menu = static::MENU_CUSTOMERS;
+                $menu[static::MENU_CUSTOMERS]['active'] = true;
                 break;
-            case self::MENU_GROUPS:
-                $this->menu = self::MENU_GROUPS;
-                $menu[self::MENU_GROUPS]['active'] = true;
+            case static::MENU_GROUPS:
+                $this->menu = static::MENU_GROUPS;
+                $menu[static::MENU_GROUPS]['active'] = true;
                 break;
             default:
-                $this->menu = self::MENU_SETTINGS;
-                $menu[self::MENU_SETTINGS]['active'] = true;
+                $this->menu = static::MENU_SETTINGS;
+                $menu[static::MENU_SETTINGS]['active'] = true;
                 break;
         }
 
@@ -744,6 +779,10 @@ class NoCaptchaRecaptcha extends Module
      * Render settings page
      *
      * @return string HTML
+     * @throws Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     protected function renderSettingsPage()
     {
@@ -759,8 +798,8 @@ class NoCaptchaRecaptcha extends Module
         $this->context->smarty->assign(
             [
             'language_iso' => $this->context->language->iso_code,
-            'site_key' => Configuration::get(self::PUBLIC_KEY),
-            'secret_key' => Configuration::get(self::PRIVATE_KEY),
+            'site_key' => Configuration::get(static::PUBLIC_KEY),
+            'secret_key' => Configuration::get(static::PRIVATE_KEY),
             'nocaptcharecaptcha_confirm_link' => $this->moduleUrl,
             'differentDomain' => $domain1 !== $domain2,
             'domain1' => $domain1,
@@ -882,7 +921,7 @@ class NoCaptchaRecaptcha extends Module
             [
                 'type' => 'text',
                 'label' => $this->l('reCAPTCHA site key'),
-                'name' => self::PUBLIC_KEY,
+                'name' => static::PUBLIC_KEY,
                 'size' => 64,
                 'desc' => $this->l('Used in the Javascript files that are served to users.'),
                 'required' => true,
@@ -890,7 +929,7 @@ class NoCaptchaRecaptcha extends Module
             [
                 'type' => 'text',
                 'label' => $this->l('reCAPTCHA secret key'),
-                'name' => self::PRIVATE_KEY,
+                'name' => static::PRIVATE_KEY,
                 'desc' => $this->l('Used for communication between the store and Google. Be sure to keep this key a secret.'),
                 'size' => 64,
                 'required' => true,
@@ -902,7 +941,7 @@ class NoCaptchaRecaptcha extends Module
             [
                 'type' => 'switch',
                 'label' => $this->l('Customer login'),
-                'name' => self::LOGIN,
+                'name' => static::LOGIN,
                 'is_bool' => true,
                 'values' => [
                     [
@@ -920,7 +959,7 @@ class NoCaptchaRecaptcha extends Module
             [
                 'type' => 'text',
                 'label' => $this->l('Login attempts'),
-                'name' => self::ATTEMPTS,
+                'name' => static::ATTEMPTS,
                 'desc' => $this->l('Amount of login attempts before captcha is shown. (0 = always)'),
                 'size' => 10,
                 'class' => 'fixed-width-xl',
@@ -929,7 +968,7 @@ class NoCaptchaRecaptcha extends Module
             [
                 'type' => 'text',
                 'label' => $this->l('Reset attempts after'),
-                'name' => self::ATTEMPTS_MINS,
+                'name' => static::ATTEMPTS_MINS,
                 'desc' => ucfirst(Translate::getAdminTranslation('minutes', 'AdminEmployees')),
                 'hint' => $this->l('0 - 0 - 0 disables time limit'),
                 'size' => 2,
@@ -938,7 +977,7 @@ class NoCaptchaRecaptcha extends Module
             ],
             [
                 'type' => 'text',
-                'name' => self::ATTEMPTS_HOURS,
+                'name' => static::ATTEMPTS_HOURS,
                 'desc' => Translate::getAdminTranslation('Hours', 'AdminBackup'),
                 'size' => 2,
                 'class' => 'fixed-width-sm',
@@ -946,7 +985,7 @@ class NoCaptchaRecaptcha extends Module
             ],
             [
                 'type' => 'text',
-                'name' => self::ATTEMPTS_DAYS,
+                'name' => static::ATTEMPTS_DAYS,
                 'desc' => Translate::getAdminTranslation('Days', 'AdminBackup'),
                 'size' => 3,
                 'class' => 'fixed-width-sm',
@@ -956,7 +995,7 @@ class NoCaptchaRecaptcha extends Module
                 'type' => 'select',
                 'lang' => true,
                 'label' => $this->l('Theme'),
-                'name' => self::LOGIN_THEME,
+                'name' => static::LOGIN_THEME,
                 'desc' => $this->l('Enable captcha and select theme for customer login'),
                 'options' => [
                     'query' => $options,
@@ -967,7 +1006,7 @@ class NoCaptchaRecaptcha extends Module
             [
                 'type' => 'switch',
                 'label' => $this->l('Disable captcha when user is logged in'),
-                'name' => self::LOGGEDINDISABLE,
+                'name' => static::LOGGEDINDISABLE,
                 'is_bool' => true,
                 'values' => [
                     [
@@ -989,7 +1028,7 @@ class NoCaptchaRecaptcha extends Module
             [
                 'type' => 'switch',
                 'label' => $this->l('Register account'),
-                'name' => self::CREATE,
+                'name' => static::CREATE,
                 'is_bool' => true,
                 'values' => [
                     [
@@ -1008,7 +1047,7 @@ class NoCaptchaRecaptcha extends Module
                 'type' => 'select',
                 'lang' => true,
                 'label' => $this->l('Theme'),
-                'name' => self::CREATE_THEME,
+                'name' => static::CREATE_THEME,
                 'desc' => $this->l('Enable captcha and select theme for the customer registration page'),
                 'options' => [
                     'query' => $options,
@@ -1023,7 +1062,7 @@ class NoCaptchaRecaptcha extends Module
             [
                 'type' => 'switch',
                 'label' => $this->l('Contact form'),
-                'name' => self::CONTACT,
+                'name' => static::CONTACT,
                 'is_bool' => true,
                 'values' => [
                     [
@@ -1042,7 +1081,7 @@ class NoCaptchaRecaptcha extends Module
                 'type' => 'select',
                 'lang' => true,
                 'label' => $this->l('Theme'),
-                'name' => self::CONTACT_THEME,
+                'name' => static::CONTACT_THEME,
                 'desc' => $this->l('Enable captcha and select theme for the contact form'),
                 'options' => [
                     'query' => $options,
@@ -1057,7 +1096,7 @@ class NoCaptchaRecaptcha extends Module
             [
                 'type' => 'switch',
                 'label' => $this->l('Password forgotten'),
-                'name' => self::PASSWORD,
+                'name' => static::PASSWORD,
                 'is_bool' => true,
                 'values' => [
                     [
@@ -1076,7 +1115,7 @@ class NoCaptchaRecaptcha extends Module
                 'type' => 'select',
                 'lang' => true,
                 'label' => $this->l('Theme'),
-                'name' => self::PASSWORD_THEME,
+                'name' => static::PASSWORD_THEME,
                 'desc' => $this->l('Enable captcha and select theme for the password forgotten form'),
                 'options' => [
                     'query' => $options,
@@ -1091,7 +1130,7 @@ class NoCaptchaRecaptcha extends Module
             [
                 'type' => 'switch',
                 'label' => $this->l('Back Office login'),
-                'name' => self::ADMINLOGIN,
+                'name' => static::ADMINLOGIN,
                 'is_bool' => true,
                 'values' => [
                     [
@@ -1110,7 +1149,7 @@ class NoCaptchaRecaptcha extends Module
                 'type' => 'select',
                 'lang' => true,
                 'label' => $this->l('Theme'),
-                'name' => self::ADMINLOGIN_THEME,
+                'name' => static::ADMINLOGIN_THEME,
                 'options' => [
                     'query' => $options,
                     'id' => 'id_option',
@@ -1126,7 +1165,7 @@ class NoCaptchaRecaptcha extends Module
                 'label' => $this->l('Ignore connection problems with Google'),
                 'hint' => $this->l('Do not check captcha if it is not possible to connect with Google'),
                 'description' => $this->l('Check PrestaShop\'s logs if the server has connection problems'),
-                'name' => self::GOOGLEIGNORE,
+                'name' => static::GOOGLEIGNORE,
                 'is_bool' => true,
                 'values' => [
                     [
@@ -1187,36 +1226,36 @@ class NoCaptchaRecaptcha extends Module
         // Assign Advanced Settings variables
         $this->context->smarty->assign(
             [
-            self::LOGINPOS => Configuration::get(self::LOGINPOS),
-            self::LOGINSELECT => Configuration::get(self::LOGINSELECT),
-            self::LOGINHTML => Configuration::get(self::LOGINHTML),
-            self::CREATEPOS => Configuration::get(self::CREATEPOS),
-            self::CREATESELECT => Configuration::get(self::CREATESELECT),
-            self::CREATEHTML => Configuration::get(self::CREATEHTML),
-            self::PASSWORDPOS => Configuration::get(self::PASSWORDPOS),
-            self::PASSWORDSELECT => Configuration::get(self::PASSWORDSELECT),
-            self::PASSWORDHTML => Configuration::get(self::PASSWORDHTML),
-            self::CONTACTPOS => Configuration::get(self::CONTACTPOS),
-            self::CONTACTSELECT => Configuration::get(self::CONTACTSELECT),
-            self::CONTACTHTML => Configuration::get(self::CONTACTHTML),
-            self::OPCLOGINPOS => Configuration::get(self::OPCLOGINPOS),
-            self::OPCLOGINSELECT => Configuration::get(self::OPCLOGINSELECT),
-            self::OPCLOGINHTML => Configuration::get(self::OPCLOGINHTML),
-            self::OPCCREATEPOS => Configuration::get(self::OPCCREATEPOS),
-            self::OPCCREATESELECT => Configuration::get(self::OPCCREATESELECT),
-            self::OPCCREATEHTML => Configuration::get(self::OPCCREATEHTML),
-            self::JQUERYOPTS => $jqueryPosOptions,
-            'advancedAction' => $this->moduleUrl.'&token='.Tools::getAdminTokenLite('AdminModules').'&menu='.self::MENU_ADVANCED_SETTINGS,
+            static::LOGINPOS => Configuration::get(static::LOGINPOS),
+            static::LOGINSELECT => Configuration::get(static::LOGINSELECT),
+            static::LOGINHTML => Configuration::get(static::LOGINHTML),
+            static::CREATEPOS => Configuration::get(static::CREATEPOS),
+            static::CREATESELECT => Configuration::get(static::CREATESELECT),
+            static::CREATEHTML => Configuration::get(static::CREATEHTML),
+            static::PASSWORDPOS => Configuration::get(static::PASSWORDPOS),
+            static::PASSWORDSELECT => Configuration::get(static::PASSWORDSELECT),
+            static::PASSWORDHTML => Configuration::get(static::PASSWORDHTML),
+            static::CONTACTPOS => Configuration::get(static::CONTACTPOS),
+            static::CONTACTSELECT => Configuration::get(static::CONTACTSELECT),
+            static::CONTACTHTML => Configuration::get(static::CONTACTHTML),
+            static::OPCLOGINPOS => Configuration::get(static::OPCLOGINPOS),
+            static::OPCLOGINSELECT => Configuration::get(static::OPCLOGINSELECT),
+            static::OPCLOGINHTML => Configuration::get(static::OPCLOGINHTML),
+            static::OPCCREATEPOS => Configuration::get(static::OPCCREATEPOS),
+            static::OPCCREATESELECT => Configuration::get(static::OPCCREATESELECT),
+            static::OPCCREATEHTML => Configuration::get(static::OPCCREATEHTML),
+            static::JQUERYOPTS => $jqueryPosOptions,
+            'advancedAction' => $this->moduleUrl.'&token='.Tools::getAdminTokenLite('AdminModules').'&menu='.static::MENU_ADVANCED_SETTINGS,
             ]
         );
 
         if (file_exists($this->local_path.'views/css/extra.css')) {
             $this->context->smarty->assign(
-                self::EXTRACSS,
-                Tools::file_get_contents($this->local_path.'views/css/extra.css')
+                static::EXTRACSS,
+                file_get_contents($this->local_path.'views/css/extra.css')
             );
         } else {
-            $this->context->smarty->assign(self::EXTRACSS, '');
+            $this->context->smarty->assign(static::EXTRACSS, '');
         }
 
         return $this->display(__FILE__, 'views/templates/admin/advanced.tpl');
@@ -1228,32 +1267,32 @@ class NoCaptchaRecaptcha extends Module
     protected function getConfigFormValues()
     {
         return [
-            self::ATTEMPTS       => Configuration::get(self::ATTEMPTS),
-            self::ATTEMPTS_MINS  => Configuration::get(self::ATTEMPTS_MINS),
-            self::ATTEMPTS_HOURS => Configuration::get(self::ATTEMPTS_HOURS),
-            self::ATTEMPTS_DAYS  => Configuration::get(self::ATTEMPTS_DAYS),
+            static::ATTEMPTS       => Configuration::get(static::ATTEMPTS),
+            static::ATTEMPTS_MINS  => Configuration::get(static::ATTEMPTS_MINS),
+            static::ATTEMPTS_HOURS => Configuration::get(static::ATTEMPTS_HOURS),
+            static::ATTEMPTS_DAYS  => Configuration::get(static::ATTEMPTS_DAYS),
 
-            self::LOGIN       => Configuration::get(self::LOGIN),
-            self::LOGIN_THEME => Configuration::get(self::LOGIN_THEME),
+            static::LOGIN       => Configuration::get(static::LOGIN),
+            static::LOGIN_THEME => Configuration::get(static::LOGIN_THEME),
 
-            self::ADMINLOGIN       => Configuration::get(self::ADMINLOGIN),
-            self::ADMINLOGIN_THEME => Configuration::get(self::ADMINLOGIN_THEME),
+            static::ADMINLOGIN       => Configuration::get(static::ADMINLOGIN),
+            static::ADMINLOGIN_THEME => Configuration::get(static::ADMINLOGIN_THEME),
 
-            self::CREATE       => Configuration::get(self::CREATE),
-            self::CREATE_THEME => Configuration::get(self::CREATE_THEME),
+            static::CREATE       => Configuration::get(static::CREATE),
+            static::CREATE_THEME => Configuration::get(static::CREATE_THEME),
 
-            self::CONTACT       => Configuration::get(self::CONTACT),
-            self::CONTACT_THEME => Configuration::get(self::CONTACT_THEME),
+            static::CONTACT       => Configuration::get(static::CONTACT),
+            static::CONTACT_THEME => Configuration::get(static::CONTACT_THEME),
 
-            self::PASSWORD       => Configuration::get(self::PASSWORD),
-            self::PASSWORD_THEME => Configuration::get(self::PASSWORD_THEME),
+            static::PASSWORD       => Configuration::get(static::PASSWORD),
+            static::PASSWORD_THEME => Configuration::get(static::PASSWORD_THEME),
 
-            self::SENDTOAFRIEND => Configuration::get(self::SENDTOAFRIEND),
+            static::SENDTOAFRIEND => Configuration::get(static::SENDTOAFRIEND),
 
-            self::PRIVATE_KEY     => Configuration::get(self::PRIVATE_KEY),
-            self::PUBLIC_KEY      => Configuration::get(self::PUBLIC_KEY),
-            self::LOGGEDINDISABLE => Configuration::get(self::LOGGEDINDISABLE),
-            self::GOOGLEIGNORE    => Configuration::get(self::GOOGLEIGNORE),
+            static::PRIVATE_KEY     => Configuration::get(static::PRIVATE_KEY),
+            static::PUBLIC_KEY      => Configuration::get(static::PUBLIC_KEY),
+            static::LOGGEDINDISABLE => Configuration::get(static::LOGGEDINDISABLE),
+            static::GOOGLEIGNORE    => Configuration::get(static::GOOGLEIGNORE),
         ];
     }
 
@@ -1363,7 +1402,7 @@ class NoCaptchaRecaptcha extends Module
                 $visitor->email = $result['email'];
                 $visitor->captcha_disabled = false;
                 $visitor->captcha_failed_attempt = '1970-01-01 00:00:00';
-                $visitor->captcha_attempts = (int) Configuration::get(self::ATTEMPTS);
+                $visitor->captcha_attempts = (int) Configuration::get(static::ATTEMPTS);
 
                 $visitor->add();
 
@@ -1379,7 +1418,7 @@ class NoCaptchaRecaptcha extends Module
         $helperList->identifier = bqSQL(RecaptchaVisitor::$definition['primary']);
         $helperList->title = $this->l('Customers');
         $helperList->token = Tools::getAdminTokenLite('AdminModules');
-        $helperList->currentIndex = $this->moduleUrl.'&menu='.self::MENU_CUSTOMERS;
+        $helperList->currentIndex = $this->moduleUrl.'&menu='.static::MENU_CUSTOMERS;
 
         $helperList->table = bqSQL(RecaptchaVisitor::$definition['table']);
 
@@ -1406,7 +1445,7 @@ class NoCaptchaRecaptcha extends Module
         $helper->currentIndex = AdminController::$currentIndex.'&'.http_build_query(
                 [
             'configure' => $this->name,
-            'menu' => self::MENU_CUSTOMERS,
+            'menu' => static::MENU_CUSTOMERS,
                 ]
             );
 
@@ -1604,7 +1643,7 @@ class NoCaptchaRecaptcha extends Module
         $helperList->identifier = bqSQL(RecaptchaGroup::$definition['primary']);
         $helperList->title = $this->l('Groups');
         $helperList->token = Tools::getAdminTokenLite('AdminModules');
-        $helperList->currentIndex = $this->moduleUrl.'&menu='.self::MENU_GROUPS;
+        $helperList->currentIndex = $this->moduleUrl.'&menu='.static::MENU_GROUPS;
 
         $helperList->table = bqSQL(RecaptchaGroup::$definition['table']);
 
@@ -1631,7 +1670,7 @@ class NoCaptchaRecaptcha extends Module
         $helper->currentIndex = AdminController::$currentIndex.'&'.http_build_query(
                 [
                 'configure' => $this->name,
-                'menu' => self::MENU_GROUPS,
+                'menu' => static::MENU_GROUPS,
                 ]
             );
 
@@ -1698,6 +1737,8 @@ class NoCaptchaRecaptcha extends Module
      * @param int $idNoCaptchaRecaptchaGroup NoCaptchaRecaptchaGroup ID
      *
      * @return array Array with current values
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     protected function getGroupValues($idNoCaptchaRecaptchaGroup)
     {
@@ -1712,7 +1753,6 @@ class NoCaptchaRecaptcha extends Module
     }
 
     /**
-     * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
     protected function syncGroups()
@@ -1727,6 +1767,10 @@ class NoCaptchaRecaptcha extends Module
      * Save form data.
      *
      * @return void
+     * @throws Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
      */
     protected function postProcess()
     {
@@ -1737,15 +1781,15 @@ class NoCaptchaRecaptcha extends Module
         }
 
         switch (Tools::getValue('menu')) {
-            case self::MENU_ADVANCED_SETTINGS:
+            case static::MENU_ADVANCED_SETTINGS:
                 $this->postProcessAdvancedSettings();
 
                 return;
-            case self::MENU_CUSTOMERS:
+            case static::MENU_CUSTOMERS:
                 $this->postProcessCustomers();
 
                 return;
-            case self::MENU_GROUPS:
+            case static::MENU_GROUPS:
                 $this->postProcessGroups();
 
                 return;
@@ -1759,7 +1803,8 @@ class NoCaptchaRecaptcha extends Module
     /**
      * method call when ajax request is made with the customer row action
      *
-     * @see AdminController::postProcess()
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function ajaxProcess()
     {
@@ -1898,6 +1943,11 @@ class NoCaptchaRecaptcha extends Module
 
     /**
      * Post process settings form
+     *
+     * @throws Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws ReflectionException
      */
     protected function postProcessSettings()
     {
@@ -1906,8 +1956,8 @@ class NoCaptchaRecaptcha extends Module
 
             foreach (array_keys($formValues) as $key) {
                 if (Tools::isSubmit($key)) {
-                    if (($key == self::PUBLIC_KEY) && !Tools::getValue($key) ||
-                        ($key == self::PRIVATE_KEY) && !Tools::getValue($key)
+                    if (($key == static::PUBLIC_KEY) && !Tools::getValue($key) ||
+                        ($key == static::PRIVATE_KEY) && !Tools::getValue($key)
                     ) {
                         $this->uninstallOptionalOverrides();
 
@@ -1915,30 +1965,30 @@ class NoCaptchaRecaptcha extends Module
 
                         return;
                     } else {
-                        if ($key == self::ATTEMPTS) {
+                        if ($key == static::ATTEMPTS) {
                             if (Validate::isInt(Tools::getValue($key))) {
-                                Configuration::updateValue(self::ATTEMPTS, (int) Tools::getValue($key));
+                                Configuration::updateValue(static::ATTEMPTS, (int) Tools::getValue($key));
                                 RecaptchaVisitor::resetAllAttempts((int) Tools::getValue($key));
                             } else {
                                 $this->addError(sprintf($this->l('The %s field is invalid.'), 'login attempts'), true);
 
                                 return;
                             }
-                        } elseif ($key == self::ADMINLOGIN) {
-                            $adminLogin = (bool) Tools::getValue(self::ADMINLOGIN);
-                            if ($adminLogin != Configuration::get(self::ADMINLOGIN)) {
+                        } elseif ($key == static::ADMINLOGIN) {
+                            $adminLogin = (bool) Tools::getValue(static::ADMINLOGIN);
+                            if ($adminLogin != Configuration::get(static::ADMINLOGIN)) {
                                 if ($adminLogin) {
                                     $this->installAdminLoginOverride();
                                 } else {
                                     $this->uninstallAdminLoginOverride();
                                 }
                             }
-                        } elseif ($key == self::LOGIN || $key == self::CREATE) {
-                            $this->manageAuthOverride(Tools::getValue(self::LOGIN), Tools::getValue(self::CREATE));
-                        } elseif ($key == self::PASSWORD) {
-                            $this->managePasswordOverride(Tools::getValue(self::PASSWORD));
-                        } elseif ($key == self::CONTACT) {
-                            $this->manageContactOverride(Tools::getValue(self::CONTACT));
+                        } elseif ($key == static::LOGIN || $key == static::CREATE) {
+                            $this->manageAuthOverride(Tools::getValue(static::LOGIN), Tools::getValue(static::CREATE));
+                        } elseif ($key == static::PASSWORD) {
+                            $this->managePasswordOverride(Tools::getValue(static::PASSWORD));
+                        } elseif ($key == static::CONTACT) {
+                            $this->manageContactOverride(Tools::getValue(static::CONTACT));
                         } else {
                             Configuration::updateValue($key, Tools::getValue($key));
                         }
@@ -1954,96 +2004,98 @@ class NoCaptchaRecaptcha extends Module
 
     /**
      * Post process advanced settings form
+     *
+     * @throws PrestaShopException
      */
     protected function postProcessAdvancedSettings()
     {
         if (Tools::isSubmit('submitRecaptchaAdvanced')) {
-            if (Tools::isSubmit(self::LOGINSELECT)) {
-                $loginSelect = Tools::getValue(self::LOGINSELECT);
+            if (Tools::isSubmit(static::LOGINSELECT)) {
+                $loginSelect = Tools::getValue(static::LOGINSELECT);
                 if (!empty($loginSelect)) {
-                    Configuration::updateValue(self::LOGINSELECT, $loginSelect);
+                    Configuration::updateValue(static::LOGINSELECT, $loginSelect);
                 } else {
                     $this->addError(sprintf($this->l('The %s jQuery selector is invalid'), $this->l('Login')), true);
                 }
             }
-            if (Tools::isSubmit(self::LOGINPOS)) {
-                Configuration::updateValue(self::LOGINPOS, Tools::getValue(self::LOGINPOS));
+            if (Tools::isSubmit(static::LOGINPOS)) {
+                Configuration::updateValue(static::LOGINPOS, Tools::getValue(static::LOGINPOS));
             }
-            if (Tools::isSubmit(self::LOGINHTML)) {
-                $this->updateHTMLValue('loginCaptcha', 'login', $this->l('Login'), self::LOGINHTML);
+            if (Tools::isSubmit(static::LOGINHTML)) {
+                $this->updateHTMLValue('loginCaptcha', 'login', $this->l('Login'), static::LOGINHTML);
             }
-            if (Tools::isSubmit(self::CREATESELECT)) {
-                $createSelect = Tools::getValue(self::CREATESELECT);
+            if (Tools::isSubmit(static::CREATESELECT)) {
+                $createSelect = Tools::getValue(static::CREATESELECT);
                 if (!empty($createSelect)) {
-                    Configuration::updateValue(self::CREATESELECT, $createSelect);
+                    Configuration::updateValue(static::CREATESELECT, $createSelect);
                 } else {
                     $this->addError(sprintf($this->l('The %s jQuery selector is invalid'), $this->l('Register')), true);
                 }
             }
-            if (Tools::isSubmit(self::CREATEPOS)) {
-                Configuration::updateValue(self::CREATEPOS, Tools::getValue(self::CREATEPOS));
+            if (Tools::isSubmit(static::CREATEPOS)) {
+                Configuration::updateValue(static::CREATEPOS, Tools::getValue(static::CREATEPOS));
             }
-            if (Tools::isSubmit(self::CREATEHTML)) {
-                $this->updateHTMLValue('createCaptcha', 'create', $this->l('Register'), self::CREATEHTML);
+            if (Tools::isSubmit(static::CREATEHTML)) {
+                $this->updateHTMLValue('createCaptcha', 'create', $this->l('Register'), static::CREATEHTML);
             }
-            if (Tools::isSubmit(self::PASSWORDSELECT)) {
-                $passwordSelect = Tools::getValue(self::PASSWORDSELECT);
+            if (Tools::isSubmit(static::PASSWORDSELECT)) {
+                $passwordSelect = Tools::getValue(static::PASSWORDSELECT);
                 if (!empty($passwordSelect)) {
-                    Configuration::updateValue(self::PASSWORDSELECT, $passwordSelect);
+                    Configuration::updateValue(static::PASSWORDSELECT, $passwordSelect);
                 } else {
                     $this->addError(sprintf($this->l('The %s jQuery selector is invalid'), $this->l('Password')), true);
                 }
             }
-            if (Tools::isSubmit(self::PASSWORDPOS)) {
-                Configuration::updateValue(self::PASSWORDPOS, Tools::getValue(self::PASSWORDPOS));
+            if (Tools::isSubmit(static::PASSWORDPOS)) {
+                Configuration::updateValue(static::PASSWORDPOS, Tools::getValue(static::PASSWORDPOS));
             }
-            if (Tools::isSubmit(self::PASSWORDHTML)) {
-                $this->updateHTMLValue('passwordCaptcha', 'password', $this->l('Password'), self::PASSWORDHTML);
+            if (Tools::isSubmit(static::PASSWORDHTML)) {
+                $this->updateHTMLValue('passwordCaptcha', 'password', $this->l('Password'), static::PASSWORDHTML);
             }
-            if (Tools::isSubmit(self::CONTACTSELECT)) {
-                $contactSelect = Tools::getValue(self::CONTACTSELECT);
+            if (Tools::isSubmit(static::CONTACTSELECT)) {
+                $contactSelect = Tools::getValue(static::CONTACTSELECT);
                 if (!empty($contactSelect)) {
-                    Configuration::updateValue(self::CONTACTSELECT, $contactSelect);
+                    Configuration::updateValue(static::CONTACTSELECT, $contactSelect);
                 } else {
                     $this->addError(sprintf($this->l('The %s jQuery selector is invalid'), $this->l('Contact')), true);
                 }
             }
-            if (Tools::isSubmit(self::CONTACTPOS)) {
-                Configuration::updateValue(self::CONTACTPOS, Tools::getValue(self::CONTACTPOS));
+            if (Tools::isSubmit(static::CONTACTPOS)) {
+                Configuration::updateValue(static::CONTACTPOS, Tools::getValue(static::CONTACTPOS));
             }
-            if (Tools::isSubmit(self::CONTACTHTML)) {
-                $this->updateHTMLValue('contactCaptcha', 'contact', $this->l('Contact'), self::CONTACTHTML);
+            if (Tools::isSubmit(static::CONTACTHTML)) {
+                $this->updateHTMLValue('contactCaptcha', 'contact', $this->l('Contact'), static::CONTACTHTML);
             }
-            if (Tools::isSubmit(self::OPCLOGINSELECT)) {
-                $opcLoginSelect = Tools::getValue(self::OPCLOGINSELECT);
+            if (Tools::isSubmit(static::OPCLOGINSELECT)) {
+                $opcLoginSelect = Tools::getValue(static::OPCLOGINSELECT);
                 if (!empty($opcLoginSelect)) {
-                    Configuration::updateValue(self::OPCLOGINSELECT, $opcLoginSelect);
+                    Configuration::updateValue(static::OPCLOGINSELECT, $opcLoginSelect);
                 } else {
                     $this->addError(sprintf($this->l('The %s jQuery selector is invalid'), $this->l('OPC Login')), true);
                 }
             }
-            if (Tools::isSubmit(self::OPCLOGINPOS)) {
-                Configuration::updateValue(self::OPCLOGINPOS, Tools::getValue(self::OPCLOGINPOS));
+            if (Tools::isSubmit(static::OPCLOGINPOS)) {
+                Configuration::updateValue(static::OPCLOGINPOS, Tools::getValue(static::OPCLOGINPOS));
             }
-            if (Tools::isSubmit(self::OPCLOGINHTML)) {
-                $this->updateHTMLValue('loginCaptcha', 'login', $this->l('OPC Login'), self::OPCLOGINHTML);
+            if (Tools::isSubmit(static::OPCLOGINHTML)) {
+                $this->updateHTMLValue('loginCaptcha', 'login', $this->l('OPC Login'), static::OPCLOGINHTML);
             }
-            if (Tools::isSubmit(self::OPCCREATESELECT)) {
-                $opcCreateSelect = Tools::getValue(self::OPCCREATESELECT);
+            if (Tools::isSubmit(static::OPCCREATESELECT)) {
+                $opcCreateSelect = Tools::getValue(static::OPCCREATESELECT);
                 if (!empty($opcCreateSelect)) {
-                    Configuration::updateValue(self::OPCCREATESELECT, $opcCreateSelect);
+                    Configuration::updateValue(static::OPCCREATESELECT, $opcCreateSelect);
                 } else {
                     $this->addError(sprintf($this->l('The %s jQuery selector is invalid'), $this->l('OPC Register')), true);
                 }
             }
-            if (Tools::isSubmit(self::OPCCREATEPOS)) {
-                Configuration::updateValue(self::OPCCREATEPOS, Tools::getValue(self::OPCCREATEPOS));
+            if (Tools::isSubmit(static::OPCCREATEPOS)) {
+                Configuration::updateValue(static::OPCCREATEPOS, Tools::getValue(static::OPCCREATEPOS));
             }
-            if (Tools::isSubmit(self::OPCCREATEHTML)) {
-                $this->updateHTMLValue('createCaptcha', 'create', $this->l('OPC Register'), self::OPCCREATEHTML);
+            if (Tools::isSubmit(static::OPCCREATEHTML)) {
+                $this->updateHTMLValue('createCaptcha', 'create', $this->l('OPC Register'), static::OPCCREATEHTML);
             }
-            if (Tools::isSubmit(self::EXTRACSS)) {
-                $extraCss = Tools::getValue(self::EXTRACSS);
+            if (Tools::isSubmit(static::EXTRACSS)) {
+                $extraCss = Tools::getValue(static::EXTRACSS);
                 if (!empty($extraCss)) {
                     if (!file_put_contents($this->local_path.'views/css/extra.css', $extraCss)) {
                         $this->addError($this->l('Couldn\'t save CSS file'), true);
@@ -2063,6 +2115,9 @@ class NoCaptchaRecaptcha extends Module
 
     /**
      * Post process customer settings
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     protected function postProcessCustomers()
     {
@@ -2090,6 +2145,9 @@ class NoCaptchaRecaptcha extends Module
 
     /**
      * Post process group settings
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     protected function postProcessGroups()
     {
@@ -2117,56 +2175,61 @@ class NoCaptchaRecaptcha extends Module
 
     /**
      * Add the CSS & JavaScript files you want to be added on the FO.
+     *
+     * @return string
+     * @throws Exception
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     public function hookHeader()
     {
         $this->context->controller->addJQuery();
         $this->context->controller->addCSS($this->_path.'views/css/extra.css');
 
-        if (Configuration::get(self::PRIVATE_KEY) && Configuration::get(self::PUBLIC_KEY) &&
-            (Configuration::get(self::LOGIN) ||
-                Configuration::get(self::CREATE) ||
-                Configuration::get(self::CONTACT) ||
-                Configuration::get(self::PASSWORD))
+        if (Configuration::get(static::PRIVATE_KEY) && Configuration::get(static::PUBLIC_KEY) &&
+            (Configuration::get(static::LOGIN) ||
+                Configuration::get(static::CREATE) ||
+                Configuration::get(static::CONTACT) ||
+                Configuration::get(static::PASSWORD))
         ) {
             $this->context->smarty->assign(
                 [
-                    self::PUBLIC_KEY => Configuration::get(self::PUBLIC_KEY),
+                    static::PUBLIC_KEY => Configuration::get(static::PUBLIC_KEY),
 
-                    self::LOGIN       => Configuration::get(self::LOGIN),
-                    self::LOGIN_THEME => Configuration::get(self::LOGIN_THEME),
-                    self::LOGINHTML   => Configuration::get(self::LOGINHTML),
-                    self::LOGINSELECT => Configuration::get(self::LOGINSELECT),
-                    self::LOGINPOS    => Configuration::get(self::LOGINPOS),
+                    static::LOGIN       => Configuration::get(static::LOGIN),
+                    static::LOGIN_THEME => Configuration::get(static::LOGIN_THEME),
+                    static::LOGINHTML   => Configuration::get(static::LOGINHTML),
+                    static::LOGINSELECT => Configuration::get(static::LOGINSELECT),
+                    static::LOGINPOS    => Configuration::get(static::LOGINPOS),
 
-                    self::CREATE       => Configuration::get(self::CREATE),
-                    self::CREATE_THEME => Configuration::get(self::CREATE_THEME),
-                    self::CREATEHTML   => Configuration::get(self::CREATEHTML),
-                    self::CREATESELECT => Configuration::get(self::CREATESELECT),
-                    self::CREATEPOS    => Configuration::get(self::CREATEPOS),
+                    static::CREATE       => Configuration::get(static::CREATE),
+                    static::CREATE_THEME => Configuration::get(static::CREATE_THEME),
+                    static::CREATEHTML   => Configuration::get(static::CREATEHTML),
+                    static::CREATESELECT => Configuration::get(static::CREATESELECT),
+                    static::CREATEPOS    => Configuration::get(static::CREATEPOS),
 
-                    self::PASSWORD       => Configuration::get(self::PASSWORD),
-                    self::PASSWORD_THEME => Configuration::get(self::PASSWORD_THEME),
-                    self::PASSWORDHTML   => Configuration::get(self::PASSWORDHTML),
-                    self::PASSWORDSELECT => Configuration::get(self::PASSWORDSELECT),
-                    self::PASSWORDPOS    => Configuration::get(self::PASSWORDPOS),
+                    static::PASSWORD       => Configuration::get(static::PASSWORD),
+                    static::PASSWORD_THEME => Configuration::get(static::PASSWORD_THEME),
+                    static::PASSWORDHTML   => Configuration::get(static::PASSWORDHTML),
+                    static::PASSWORDSELECT => Configuration::get(static::PASSWORDSELECT),
+                    static::PASSWORDPOS    => Configuration::get(static::PASSWORDPOS),
 
-                    self::OPCLOGINHTML   => Configuration::get(self::OPCLOGINHTML),
-                    self::OPCLOGINSELECT => Configuration::get(self::OPCLOGINSELECT),
-                    self::OPCLOGINPOS    => Configuration::get(self::OPCLOGINPOS),
+                    static::OPCLOGINHTML   => Configuration::get(static::OPCLOGINHTML),
+                    static::OPCLOGINSELECT => Configuration::get(static::OPCLOGINSELECT),
+                    static::OPCLOGINPOS    => Configuration::get(static::OPCLOGINPOS),
 
-                    self::OPCCREATEHTML   => Configuration::get(self::OPCCREATEHTML),
-                    self::OPCCREATESELECT => Configuration::get(self::OPCCREATESELECT),
-                    self::OPCCREATEPOS    => Configuration::get(self::OPCCREATEPOS),
+                    static::OPCCREATEHTML   => Configuration::get(static::OPCCREATEHTML),
+                    static::OPCCREATESELECT => Configuration::get(static::OPCCREATESELECT),
+                    static::OPCCREATEPOS    => Configuration::get(static::OPCCREATEPOS),
 
-                    self::CONTACT       => Configuration::get(self::CONTACT),
-                    self::CONTACT_THEME => Configuration::get(self::CONTACT_THEME),
-                    self::CONTACTHTML   => Configuration::get(self::CONTACTHTML),
-                    self::CONTACTSELECT => Configuration::get(self::CONTACTSELECT),
-                    self::CONTACTPOS    => Configuration::get(self::CONTACTPOS),
+                    static::CONTACT       => Configuration::get(static::CONTACT),
+                    static::CONTACT_THEME => Configuration::get(static::CONTACT_THEME),
+                    static::CONTACTHTML   => Configuration::get(static::CONTACTHTML),
+                    static::CONTACTSELECT => Configuration::get(static::CONTACTSELECT),
+                    static::CONTACTPOS    => Configuration::get(static::CONTACTPOS),
 
-                    self::PS15COMPAT                     => Configuration::get(self::PS15COMPAT),
-                    self::GOOGLEIGNORE                   => Configuration::get(self::GOOGLEIGNORE),
+                    static::PS15COMPAT                     => Configuration::get(static::PS15COMPAT),
+                    static::GOOGLEIGNORE                   => Configuration::get(static::GOOGLEIGNORE),
                     'nocaptcharecaptcha_module_link'            => $this->context->link->getModuleLink($this->name, 'captchaenabled', [], true),
                     'nocaptcharecaptcha_guest_checkout_enabled' => (bool) Configuration::get('PS_GUEST_CHECKOUT_ENABLED'),
                     'nocaptcharecaptcha_show_at_start'          => !empty(Context::getContext()->cookie->email),
@@ -2178,11 +2241,11 @@ class NoCaptchaRecaptcha extends Module
 
             if ('authentication' == @$this->context->controller->php_self) {
                 return $this->display(__FILE__, 'views/templates/front/authcaptcha.tpl');
-            } elseif ('contact' == @$this->context->controller->php_self && Configuration::get(self::CONTACT)) {
+            } elseif ('contact' == @$this->context->controller->php_self && Configuration::get(static::CONTACT)) {
                 return $this->display(__FILE__, 'views/templates/front/contactcaptcha.tpl');
-            } elseif ('password' == @$this->context->controller->php_self && Configuration::get(self::PASSWORD)) {
+            } elseif ('password' == @$this->context->controller->php_self && Configuration::get(static::PASSWORD)) {
                 return $this->display(__FILE__, 'views/templates/front/passwordcaptcha.tpl');
-            } elseif ('order-opc' == @$this->context->controller->php_self && Configuration::get(self::LOGIN)) {
+            } elseif ('order-opc' == @$this->context->controller->php_self && Configuration::get(static::LOGIN)) {
                 return $this->display(__FILE__, 'views/templates/front/standardopccaptcha.tpl');
             }
         }
@@ -2194,6 +2257,9 @@ class NoCaptchaRecaptcha extends Module
      * Add JS to back office
      *
      * @return string HTML
+     * @throws Exception
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     public function hookDisplayBackOfficeHeader()
     {
@@ -2205,7 +2271,7 @@ class NoCaptchaRecaptcha extends Module
             $this->context->controller->addCSS($this->_path.'views/css/hopscotch.css');
             $this->context->controller->addJS($this->_path.'views/js/libs/hopscotch.js');
             $this->context->controller->addJS('https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.0/js.cookie.min.js');
-            if (!Tools::isSubmit('menu') || (int) Tools::isSubmit('menu') === self::MENU_SETTINGS) {
+            if (!Tools::isSubmit('menu') || (int) Tools::isSubmit('menu') === static::MENU_SETTINGS) {
                 $output .= $this->display(__FILE__, 'views/templates/admin/introtour.tpl');
             }
 
@@ -2219,11 +2285,14 @@ class NoCaptchaRecaptcha extends Module
      * Hook after auth succeeded to reset attempts
      *
      * @param array $params Those mysterious parameters
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function hookActionAuthentication($params)
     {
         if (Validate::isEmail($this->context->customer->email)) {
-            $this->resetAttempt($this->context->customer->email, Configuration::get(self::ATTEMPTS));
+            $this->resetAttempt($this->context->customer->email, Configuration::get(static::ATTEMPTS));
         }
     }
 
@@ -2234,6 +2303,8 @@ class NoCaptchaRecaptcha extends Module
      * @param string $email The user's email address
      *
      * @return bool Whether the decrease succeeded
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function failedAttempt($email)
     {
@@ -2244,7 +2315,9 @@ class NoCaptchaRecaptcha extends Module
      * Get last attempt datetime
      *
      * @param string $email The user's email address
+     *
      * @return string MySQL Datetime (Y-m-d H:i:s)
+     * @throws PrestaShopException
      */
     public function getLastAttempt($email)
     {
@@ -2270,6 +2343,8 @@ class NoCaptchaRecaptcha extends Module
      * @param int    $number Reset the amount of attempts to this number
      *
      * @return bool Whether the reset succeeded
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function resetAttempt($email, $number)
     {
@@ -2280,12 +2355,13 @@ class NoCaptchaRecaptcha extends Module
      * Check whether a timeout has been configured
      *
      * @return bool
+     * @throws PrestaShopException
      */
     public function hasTimeout()
     {
-        $mins = (int) Configuration::get(self::ATTEMPTS_MINS);
-        $hours = (int) Configuration::get(self::ATTEMPTS_HOURS);
-        $days = (int) Configuration::get(self::ATTEMPTS_DAYS);
+        $mins = (int) Configuration::get(static::ATTEMPTS_MINS);
+        $hours = (int) Configuration::get(static::ATTEMPTS_HOURS);
+        $days = (int) Configuration::get(static::ATTEMPTS_DAYS);
 
         return $mins + $hours + $days > 0;
     }
@@ -2296,13 +2372,15 @@ class NoCaptchaRecaptcha extends Module
      * @param string $email
      *
      * @return bool
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function hasAttemptsLeft($email)
     {
         if (Validate::isEmail($email)) {
             // Check if attempts have been expired
             if ($this->attemptsExpired($email)) {
-                $this->resetAttempt($email, Configuration::get(self::ATTEMPTS));
+                $this->resetAttempt($email, Configuration::get(static::ATTEMPTS));
 
                 return true;
             }
@@ -2314,7 +2392,7 @@ class NoCaptchaRecaptcha extends Module
             $sql->where('rc.`email` = \''.pSQL($email).'\'');
             $val = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
             if (empty($val)) {
-                $captchaAttempts = (int) Configuration::get(self::ATTEMPTS);
+                $captchaAttempts = (int) Configuration::get(static::ATTEMPTS);
                 Db::getInstance()->insert(
                     bqSQL(RecaptchaVisitor::$definition['table']),
                     [
@@ -2341,6 +2419,7 @@ class NoCaptchaRecaptcha extends Module
      * @param string $email The user's email address
      *
      * @return bool Whether the attempts need to be reset
+     * @throws PrestaShopException
      */
     public function attemptsExpired($email)
     {
@@ -2349,9 +2428,9 @@ class NoCaptchaRecaptcha extends Module
             return false;
         }
 
-        $mins = (int) Configuration::get(self::ATTEMPTS_MINS);
-        $hours = (int) Configuration::get(self::ATTEMPTS_HOURS);
-        $days = (int) Configuration::get(self::ATTEMPTS_DAYS);
+        $mins = (int) Configuration::get(static::ATTEMPTS_MINS);
+        $hours = (int) Configuration::get(static::ATTEMPTS_HOURS);
+        $days = (int) Configuration::get(static::ATTEMPTS_DAYS);
 
         $deadline = new DateTime('NOW');
         $deadline->modify(sprintf('-%d minute%s', $mins, (($mins === 1) ? '' : 's')));
@@ -2373,6 +2452,8 @@ class NoCaptchaRecaptcha extends Module
      * @param string $email The user's email address
      *
      * @return bool True if the user has exemption
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function hasExemption($email)
     {
@@ -2390,7 +2471,7 @@ class NoCaptchaRecaptcha extends Module
                 return true;
             }
         } else {
-            if ((int) Configuration::get(self::ATTEMPTS) > 0) {
+            if ((int) Configuration::get(static::ATTEMPTS) > 0) {
                 return true;
             }
         }
@@ -2428,6 +2509,8 @@ class NoCaptchaRecaptcha extends Module
      * @param string $email The user's email address
      *
      * @return bool Whether the user needs a captcha
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function needsCaptcha($type = 'login', $email = null)
     {
@@ -2435,11 +2518,11 @@ class NoCaptchaRecaptcha extends Module
             return false;
         }
 
-        if (Configuration::get(self::PUBLIC_KEY) && Configuration::get(self::PRIVATE_KEY)) {
+        if (Configuration::get(static::PUBLIC_KEY) && Configuration::get(static::PRIVATE_KEY)) {
             switch ($type) {
                 case 'login':
-                    if (Configuration::get(self::LOGIN)) {
-                        if ((int) Configuration::get(self::ATTEMPTS) === 0) {
+                    if (Configuration::get(static::LOGIN)) {
+                        if ((int) Configuration::get(static::ATTEMPTS) === 0) {
                             return !$this->hasExemption($email);
                         }
                         if ($this->hasAttemptsLeft($email)) {
@@ -2450,16 +2533,16 @@ class NoCaptchaRecaptcha extends Module
                     }
                     break;
                 case 'register':
-                    return (bool) Configuration::get(self::CREATE);
+                    return (bool) Configuration::get(static::CREATE);
                 case 'contact':
-                    if (Configuration::get(self::CONTACT)) {
+                    if (Configuration::get(static::CONTACT)) {
                         if ($this->hasExemption($email)) {
                             return false;
                         }
                         $cookieEmail = Context::getContext()->cookie->email;
                         if ($cookieEmail != '' &&
                             $email == $cookieEmail &&
-                            Configuration::get(self::LOGGEDINDISABLE)
+                            Configuration::get(static::LOGGEDINDISABLE)
                         ) {
                             return false;
                         } else {
@@ -2468,9 +2551,9 @@ class NoCaptchaRecaptcha extends Module
                     }
                     break;
                 case 'forgotpassword':
-                    return (bool) Configuration::get(self::PASSWORD);
+                    return (bool) Configuration::get(static::PASSWORD);
                 case 'adminlogin':
-                    return (bool) Configuration::get(self::ADMINLOGIN);
+                    return (bool) Configuration::get(static::ADMINLOGIN);
             }
         }
 
@@ -2481,6 +2564,7 @@ class NoCaptchaRecaptcha extends Module
      * Detect Back Office settings
      *
      * @return array Error messages strings
+     * @throws PrestaShopException
      */
     protected function detectBOSettings()
     {
@@ -2519,6 +2603,7 @@ class NoCaptchaRecaptcha extends Module
      * @param $lang  int Language id
      *
      * @return string Returns the localized tab name
+     * @throws PrestaShopException
      */
     protected function getTabName($class, $lang)
     {
@@ -2573,7 +2658,7 @@ class NoCaptchaRecaptcha extends Module
 
             return false;
         } else {
-            file_put_contents($pathOverride, preg_replace('#(\r\n|\r)#ism', "\n", Tools::file_get_contents($pathOverride)));
+            file_put_contents($pathOverride, preg_replace('#(\r\n|\r)#ism', "\n", file_get_contents($pathOverride)));
         }
         $patternEscapeCom = '#(^\s*?\/\/.*?\n|\/\*(?!\n\s+\* module:.*?\* date:.*?\* version:.*?\*\/).*?\*\/)#ism';
         // Check if there is already an override file, if not, we just need to copy the file
@@ -2764,7 +2849,7 @@ class NoCaptchaRecaptcha extends Module
 
             return false;
         }
-        file_put_contents($overridePath, preg_replace('#(\r\n|\r)#ism', "\n", Tools::file_get_contents($overridePath)));
+        file_put_contents($overridePath, preg_replace('#(\r\n|\r)#ism', "\n", file_get_contents($overridePath)));
         if ($origPath) {
             // Get a uniq id for the class, because you can override a class (or remove the override) twice in the same session and we need to avoid redeclaration
             do {
@@ -2882,6 +2967,9 @@ class NoCaptchaRecaptcha extends Module
      * @param mixed  $values Configuration values, can be string or array with id_lang as key
      *
      * @param bool   $html
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function updateAllValue($key, $values, $html = false)
     {
@@ -2969,6 +3057,7 @@ class NoCaptchaRecaptcha extends Module
      * @param string $key      Configuration key
      *
      * @return void
+     * @throws PrestaShopException
      */
     protected function updateHTMLValue($id, $type, $typeLang, $key)
     {
@@ -3036,6 +3125,7 @@ class NoCaptchaRecaptcha extends Module
      * @param $fieldsList
      *
      * @return array|string
+     * @throws ReflectionException
      */
     protected function getSQLFilter($helperList, $fieldsList)
     {
@@ -3238,6 +3328,8 @@ class NoCaptchaRecaptcha extends Module
      * Recommended to run on config page
      *
      * @return void
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     protected function checkHooks()
     {
@@ -3281,7 +3373,7 @@ class NoCaptchaRecaptcha extends Module
         if (isset(Context::getContext()->employee->id) && Context::getContext()->employee->id && Shop::getContext() == Shop::CONTEXT_SHOP) {
             $cookie = Context::getContext()->cookie->getFamily('shopContext');
 
-            return (int) Tools::substr($cookie['shopContext'], 2, count($cookie['shopContext']));
+            return (int) substr($cookie['shopContext'], 2, count($cookie['shopContext']));
         }
 
         return (int) Context::getContext()->shop->id;

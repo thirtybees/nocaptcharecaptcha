@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2017 thirty bees
+ * Copyright (C) 2017-2018 thirty bees
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to license@thirtybees.com so we can send you a copy immediately.
  *
  * @author    thirty bees <modules@thirtybees.com>
- * @copyright 2017 thirty bees
+ * @copyright 2017-2018 thirty bees
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -52,6 +52,8 @@ class RecaptchaGroup extends \ObjectModel
      * @param array $range RecaptchaGroup IDs
      *
      * @return bool Indicates whether the captchas have been successfully enabled
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public static function enableCaptchas($range)
     {
@@ -78,6 +80,8 @@ class RecaptchaGroup extends \ObjectModel
      * @param array $range RecaptchaGroup IDs
      *
      * @return bool Indicates whether the captchas have been successfully disabled
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public static function disableCaptchas($range)
     {
@@ -104,13 +108,16 @@ class RecaptchaGroup extends \ObjectModel
      * @param int $idRecaptchaGroup
      *
      * @return bool Indicates whether the captcha status has been successfully toggled
+     * @throws \PrestaShopException
      */
     public static function toggle($idRecaptchaGroup)
     {
-        return \Db::getInstance()->execute(
-            'UPDATE '._DB_PREFIX_.\bqSQL(static::$definition['table']).'
-             SET captcha_disabled = IF(captcha_disabled=1, 0, 1)
-             WHERE `'.bqSQL(static::$definition['primary']).'` = '.(int) $idRecaptchaGroup
+        return \Db::getInstance()->update(
+            bqSQL(static::$definition['table']),
+            [
+                'captcha_disabled' => ['type' => 'sql', 'value' => 'IF(captcha_disabled=1, 0, 1)'],
+            ],
+            '`'.bqSQL(static::$definition['primary']).'` = '.(int) $idRecaptchaGroup
         );
     }
 }

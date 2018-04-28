@@ -35,6 +35,9 @@
 
 namespace NoCaptchaRecaptchaModule;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+
 if (!defined('_TB_VERSION_')) {
     exit;
 }
@@ -71,6 +74,8 @@ class RecaptchaLib
      * @param string $response response string from recaptcha verification.
      *
      * @return RecaptchaResponse
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public function verifyResponse($remoteIp, $response)
     {
@@ -133,7 +138,11 @@ class RecaptchaLib
     private function submitHttpGet($path, $data)
     {
         $req = $this->encodeQs($data);
-        $response = \Tools::file_get_contents($path.$req);
+        try {
+            $response = (string) (new Client(['verify' => _PS_TOOL_DIR_.'cacert.pem']))->get($path.$req)->getBody();
+        } catch (ClientException $e) {
+            $response = '';
+        }
 
         return $response;
     }

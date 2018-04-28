@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2017 thirty bees
+ * Copyright (C) 2017-2018 thirty bees
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to license@thirtybees.com so we can send you a copy immediately.
  *
  *  @author    thirty bees <modules@thirtybees.com>
- *  @copyright 2017 thirty bees
+ *  @copyright 2017-2018 thirty bees
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -28,6 +28,10 @@ class NocaptcharecaptchaCaptchaenabledModuleFrontController extends ModuleFrontC
 {
     /**
      * NocaptcharecaptchaCaptchaenabledModuleFrontController constructor.
+     *
+     * @throws Adapter_Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function __construct()
     {
@@ -37,7 +41,8 @@ class NocaptcharecaptchaCaptchaenabledModuleFrontController extends ModuleFrontC
     }
 
     /**
-     * Initialize content
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function initContent()
     {
@@ -48,6 +53,8 @@ class NocaptcharecaptchaCaptchaenabledModuleFrontController extends ModuleFrontC
 
     /**
      * Display Ajax response
+     *
+     * @throws PrestaShopException
      */
     public function displayAjax()
     {

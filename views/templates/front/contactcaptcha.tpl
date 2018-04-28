@@ -1,5 +1,5 @@
 {*
- * Copyright (C) 2017 thirty bees
+ * Copyright (C) 2017-2018 thirty bees
  *
  * NOTICE OF LICENSE
  *
@@ -12,7 +12,7 @@
  * to license@thirtybees.com so we can send you a copy immediately.
  *
  *  @author    thirty bees <modules@thirtybees.com>
- *  @copyright 2017 thirty bees
+ *  @copyright 2017-2018 thirty bees
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *
 *}
@@ -51,8 +51,8 @@
 		if (nocaptcharecaptcha_contact && nocaptcharecaptcha_public_key) {
 			$('#contactCaptcha').empty();
 			contactCaptchaId = grecaptcha.render('contactCaptcha', {
-				'sitekey': nocaptcharecaptcha_public_key,
-				'theme': (nocaptcharecaptcha_contact_theme === '2') ? 'dark' : 'light',
+				sitekey: nocaptcharecaptcha_public_key,
+				theme: (nocaptcharecaptcha_contact_theme === '2') ? 'dark' : 'light',
 			});
 		}
 	}

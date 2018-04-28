@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2017 thirty bees
+ * Copyright (C) 2017-2018 thirty bees
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to license@thirtybees.com so we can send you a copy immediately.
  *
  *  @author    thirty bees <modules@thirtybees.com>
- *  @copyright 2017 thirty bees
+ *  @copyright 2017-2018 thirty bees
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -58,6 +58,8 @@ class RecaptchaVisitor extends \ObjectModel
      * @param array $range RecaptchaVisitor IDs
      *
      * @return bool Indicates whether the captchas have been successfully enabled
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public static function enableCaptchas($range)
     {
@@ -84,6 +86,8 @@ class RecaptchaVisitor extends \ObjectModel
      * @param array $range RecaptchaVisitor IDs
      *
      * @return bool Indicates whether the captchas have been successfully disabled
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public static function disableCaptchas($range)
     {
@@ -110,6 +114,8 @@ class RecaptchaVisitor extends \ObjectModel
      * @param int $number Reset all attempts to this number
      *
      * @return bool Indicates whether the reset succeeded
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public static function resetAllAttempts($number)
     {
@@ -130,6 +136,8 @@ class RecaptchaVisitor extends \ObjectModel
      * @param int    $number Amount of attempts for reset
      *
      * @return bool Indicates whether the attempts have been reset
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public static function resetAttemptsByEmail($email, $number)
     {
@@ -174,6 +182,8 @@ class RecaptchaVisitor extends \ObjectModel
      * @param string $email Email address
      *
      * @return bool Indicates whether the failed attempt has been registered
+     * @throws \PrestaShopDatabaseException
+     * @throws \PrestaShopException
      */
     public static function failedAttempt($email)
     {
@@ -222,6 +232,7 @@ class RecaptchaVisitor extends \ObjectModel
      * @param string $email Email address
      *
      * @return bool Indicates whether the amount has been successfully decreased
+     * @throws \PrestaShopException
      */
     public static function decreaseAttempts($email)
     {
@@ -243,6 +254,7 @@ class RecaptchaVisitor extends \ObjectModel
      * @param int $idRecaptchaVisitor
      *
      * @return bool Indicates whether the captcha status has been successfully toggled
+     * @throws \PrestaShopException
      */
     public static function toggle($idRecaptchaVisitor)
     {
