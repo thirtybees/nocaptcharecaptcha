@@ -45,7 +45,7 @@
 		<p><em>{l s='Secret key' mod='nocaptcharecaptcha'}:</em> <pre id="secretkeyPlaceholder">{$secret_key|escape:'html':'UTF-8'}</pre></p>
 		<strong>{l s='Captcha' mod='nocaptcharecaptcha'}:</strong>
 		<div id="confirmCaptcha"></div>
-		<br />
+		<br id="confirmCaptchaInsertBefore" />
 		<strong>{l s='Confirmation' mod='nocaptcharecaptcha'}:</strong>
 		<div id="confirmationRow" class="row">
 			<div class="alert alert-info">{l s='Unknown' mod='nocaptcharecaptcha'}</div>
@@ -58,6 +58,12 @@
 	window.captchaConfirmed = false;
 
 	function onloadCallback() {
+		var elem = document.getElementById('confirmCaptcha');
+		var parent = elem.parentNode;
+		parent.removeChild(elem);
+		var newElem = document.createElement('ID');
+		newElem.id = 'confirmCaptcha';
+		parent.insertBefore(newElem, document.getElementById('confirmCaptchaInsertBefore'));
 		window.confirmCaptchaId = grecaptcha.render('confirmCaptcha', {
 			'sitekey': $('#NCRC_PUBLIC_KEY').val(),
 			'theme': 'light',
