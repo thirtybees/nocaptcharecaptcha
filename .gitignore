@@ -1,0 +1,10 @@
+
+/translations/*
+!/translations/index.php
+
+/config*.xml
+
+nocaptcharecaptcha-*.zip
+
+/cache/*
+!/**/index.php
