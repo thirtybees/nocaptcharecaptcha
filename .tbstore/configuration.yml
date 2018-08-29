@@ -7,8 +7,15 @@ tags:
   - recaptcha
   - email form
   - security
-description_short: The No Captcha reCaptcha module allows you to protect your forms with catchas.
+description_short: Protects your store from spambots and brute force attacks with the new reCAPTCHA by Google.
 description: description.md
 images:
   - image-1.png
-license: AFL
+gdpr_compliant: false
+license: AFL 3.0
+php_version:
+  - 5.5
+  - 5.6
+  - 7.0
+  - 7.1
+  - 7.2

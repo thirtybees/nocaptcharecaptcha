@@ -126,8 +126,8 @@ class NoCaptchaRecaptcha extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('No CAPTCHA reCAPTCHA');
-        $this->description = $this->l('Protects your store from spambots and brute force attacks with the new reCAPTCHA by Google');
+        $this->displayName = $this->l('No Captcha reCaptcha Module');
+        $this->description = $this->l('Protects your store from spambots and brute force attacks with the new reCAPTCHA by Google.');
     }
 
     /**
