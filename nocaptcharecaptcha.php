@@ -128,6 +128,7 @@ class NoCaptchaRecaptcha extends Module
 
         $this->displayName = $this->l('No Captcha reCaptcha Module');
         $this->description = $this->l('Protects your store from spambots and brute force attacks with the new reCAPTCHA by Google.');
+        $this->tb_versions_compliancy = '> 1.0.0';
     }
 
     /**
