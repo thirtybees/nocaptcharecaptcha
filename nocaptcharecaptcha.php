@@ -2248,7 +2248,7 @@ class NoCaptchaRecaptcha extends Module
             trim(Tools::getValue('configure')) === 'nocaptcharecaptcha'
         ) {
             $this->context->controller->addJquery();
-            $this->context->controller->addCSS($this->_path.'views/css/hopscotch.css');
+            $this->context->controller->addCSS($this->_path.'views/css/libs/hopscotch.css');
             $this->context->controller->addJS($this->_path.'views/js/libs/hopscotch.js');
             $this->context->controller->addJS('https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.0/js.cookie.min.js');
             if (!Tools::isSubmit('menu') || (int) Tools::isSubmit('menu') === static::MENU_SETTINGS) {
