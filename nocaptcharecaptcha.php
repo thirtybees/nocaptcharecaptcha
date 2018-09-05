@@ -25,7 +25,7 @@ if (!defined('_TB_VERSION_')) {
     exit;
 }
 
-require_once dirname(__FILE__).'/lib/autoload.php';
+require_once dirname(__FILE__).'/libs/autoload.php';
 require_once dirname(__FILE__).'/classes/autoload.php';
 
 /**
