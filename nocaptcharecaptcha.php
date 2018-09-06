@@ -3351,12 +3351,16 @@ class NoCaptchaRecaptcha extends Module
      */
     public function getShopId()
     {
-        if (isset(Context::getContext()->employee->id) && Context::getContext()->employee->id && Shop::getContext() == Shop::CONTEXT_SHOP) {
-            $cookie = Context::getContext()->cookie->getFamily('shopContext');
+        $context = Context::getContext();
 
-            return (int) substr($cookie['shopContext'], 2, count($cookie['shopContext']));
+        if (isset($context->employee->id)
+            && $context->employee->id
+            && Shop::getContext() == Shop::CONTEXT_SHOP) {
+            $cookie = $context->cookie->getFamily('shopContext');
+
+            return (int) substr($cookie['shopContext'], 2);
         }
 
-        return (int) Context::getContext()->shop->id;
+        return (int) $context->shop->id;
     }
 }
