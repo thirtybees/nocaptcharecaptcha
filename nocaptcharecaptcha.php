@@ -614,37 +614,31 @@ class NoCaptchaRecaptcha extends Module
         // Uninstall overrides
         try {
             $this->uninstallAdminLoginOverride();
-        } catch (Exception $e) {
+        } catch (Exception $ignored) {
         }
 
         try {
-            if ($this->removeOptionalOverride(
+            $this->removeOptionalOverride(
                 'AuthController',
                 _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'AuthController.php'
-            )) {
-                return false;
-            }
-        } catch (Exception $e) {
+            );
+        } catch (Exception $ignored) {
         }
 
         try {
-            if ($this->removeOptionalOverride(
+            $this->removeOptionalOverride(
                 'PasswordController',
                 _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'PasswordController.php'
-            )) {
-                return false;
-            }
-        } catch (Exception $e) {
+            );
+        } catch (Exception $ignored) {
         }
 
         try {
-            if ($this->removeOptionalOverride(
+            $this->removeOptionalOverride(
                 'ContactController',
                 _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'ContactController.php'
-            )) {
-                return false;
-            }
-        } catch (Exception $e) {
+            );
+        } catch (Exception $ignored) {
         }
 
         $this->updateAllValue(static::LOGIN, false);
