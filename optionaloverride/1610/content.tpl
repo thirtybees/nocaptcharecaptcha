@@ -1,5 +1,5 @@
 {**
- * Copyright (C) 2017-2018 thirty bees
+ * Copyright (C) 2017-2019 thirty bees
  *
  * NOTICE OF LICENSE
  *
@@ -12,7 +12,7 @@
  * to license@thirtybees.com so we can send you a copy immediately.
  *
  * @author    thirty bees <modules@thirtybees.com>
- * @copyright 2017-2018 thirty bees
+ * @copyright 2017-2019 thirty bees
  * @license   Academic Free License (AFL 3.0)
  *}
 
@@ -135,7 +135,7 @@
 <div id="login-panel">
 	<div id="login-header">
 		<h1 class="text-center">
-			<img id="logo" src="{$img_dir}thirtybees@2x.png" width="155px" height="39px" alt="thirty bees" />
+			<img id="logo" src="{$img_dir}thirty-bees@2x.png" width="155px" height="39px" alt="thirty bees" />
 		</h1>
 		<div class="text-center">{$ps_version}</div>
 		<div id="error" class="hide alert alert-danger">
@@ -254,22 +254,22 @@
 	{hook h="displayAdminLogin"}
 	<div id="login-footer">
 		<p class="text-center text-muted">
-			<a href="http://www.prestashop.com/" onclick="return !window.open(this.href);">
-				&copy; PrestaShop&#8482; 2007-{$smarty.now|date_format:"%Y"|escape:'htmlall':'UTF-8'} - All rights reserved
+			<a href="http://www.thirtybees.com/" onclick="return !window.open(this.href);">
+				&copy; thirty bees&#8482; 2007-{$smarty.now|date_format:"%Y"} - All rights reserved
 			</a>
 		</p>
 		<p class="text-center">
-			<a class="link-social link-twitter _blank" href="https://twitter.com/PrestaShop" title="Twitter">
+			<a class="link-social link-twitter _blank" href="https://twitter.com/thethirtybees" title="Twitter">
 				<i class="icon-twitter"></i>
 			</a>
-			<a class="link-social link-facebook _blank" href="https://www.facebook.com/prestashop" title="Facebook">
+			<a class="link-social link-facebook _blank" href="https://www.facebook.com/thirtybees" title="Facebook">
 				<i class="icon-facebook"></i>
 			</a>
-			<a class="link-social link-github _blank" href="https://www.prestashop.com/github" title="Github">
+			<a class="link-social link-github _blank" href="https://github.com/thirtybees" title="Github">
 				<i class="icon-github"></i>
 			</a>
-			<a class="link-social link-google _blank" href="https://plus.google.com/+prestashop/" title="Google">
-				<i class="icon-google-plus"></i>
+			<a class="link-social link-reddit _blank" href="https://www.reddit.com/r/thirtybees/" title="Reddit">
+				<i class="icon-reddit"></i>
 			</a>
 		</p>
 	</div>
