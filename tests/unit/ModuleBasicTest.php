@@ -27,7 +27,7 @@ class ModuleBasicTest extends \Codeception\TestCase\Test
 
     protected function _before()
     {
-        $this->module = Module::getInstanceByName('NoCaptchaRecaptcha');
+        $this->module = Module::getInstanceByName('nocaptcharecaptcha');
     }
 
     protected function _after()
@@ -36,7 +36,7 @@ class ModuleBasicTest extends \Codeception\TestCase\Test
 
     public function testModuleNameExists()
     {
-        $this->assertEquals($this->module->name, 'NoCaptchaRecaptcha');
+        $this->assertEquals($this->module->name, 'nocaptcharecaptcha');
     }
 
     public function testBootstrapTrue()

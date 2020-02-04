@@ -1863,7 +1863,7 @@ class NoCaptchaRecaptcha extends Module
                             'data' => [
                                 'confirmed' => false,
                                 'message'   => Translate::getModuleTranslation(
-                                    'NoCaptchaRecaptcha',
+                                    'nocaptcharecaptcha',
                                     'The reCAPTCHA secret key is invalid. Please contact the site administrator.',
                                     'configure'
                                 ),
@@ -1876,7 +1876,7 @@ class NoCaptchaRecaptcha extends Module
                             'data' => [
                                 'confirmed' => false,
                                 'message'   => Translate::getModuleTranslation(
-                                    'NoCaptchaRecaptcha',
+                                    'nocaptcharecaptcha',
                                     'Unable to connect to Google in order to verify the captcha. Please check your server settings or contact your hosting provider.',
                                     'configure'
                                 ),
@@ -1889,7 +1889,7 @@ class NoCaptchaRecaptcha extends Module
                             'data' => [
                                 'confirmed' => false,
                                 'message'   => Translate::getModuleTranslation(
-                                    'NoCaptchaRecaptcha',
+                                    'nocaptcharecaptcha',
                                     'Your captcha was wrong. Please try again.',
                                     'configure'
                                 ),

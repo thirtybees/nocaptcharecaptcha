@@ -24,7 +24,7 @@ if ($workspace = getenv('WORKSPACE')) {
 }
 
 // Install module
-$module = Module::getInstanceByName('NoCaptchaRecaptcha');
+$module = Module::getInstanceByName('nocaptcharecaptcha');
 $module->install();
 
 // Install default customer

@@ -21,7 +21,7 @@ class PasswordController extends PasswordControllerCore
 {
     public function postProcess()
     {
-        if (!Module::isEnabled('NoCaptchaRecaptcha')
+        if (!Module::isEnabled('nocaptcharecaptcha')
             || !@filemtime(_PS_MODULE_DIR_.'nocaptcharecaptcha/nocaptcharecaptcha.php')
         ) {
             return parent::postProcess();
@@ -38,7 +38,7 @@ class PasswordController extends PasswordControllerCore
                 if ($resp->error_codes[0] === 'invalid-input-secret') {
                     $this->errors[] = Tools::displayError(
                         Translate::getModuleTranslation(
-                            'NoCaptchaRecaptcha',
+                            'nocaptcharecaptcha',
                             'The reCAPTCHA secret key is invalid. Please contact the site administrator.',
                             'configure'
                         )
@@ -47,7 +47,7 @@ class PasswordController extends PasswordControllerCore
                     if (!Configuration::get('NCRC_GOOGLEIGNORE')) {
                         $this->errors[] = Tools::displayError(
                             Translate::getModuleTranslation(
-                                'NoCaptchaRecaptcha',
+                                'nocaptcharecaptcha',
                                 'Unable to connect to Google in order to verify the captcha. Please check your server settings or contact your hosting provider.',
                                 'configure'
                             )
@@ -56,7 +56,7 @@ class PasswordController extends PasswordControllerCore
                 } else {
                     $this->errors[] = Tools::displayError(
                         Translate::getModuleTranslation(
-                            'NoCaptchaRecaptcha',
+                            'nocaptcharecaptcha',
                             'Your captcha was wrong. Please try again.',
                             'configure'
                         )
