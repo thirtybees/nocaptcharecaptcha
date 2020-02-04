@@ -2432,25 +2432,25 @@ class NoCaptchaRecaptcha extends Module
      */
     public function hasExemption($email)
     {
+        if (! $email) {
+            return false;
+        }
+
         if (!Validate::isEmail($email)) {
             return false;
         }
+
         // Check if customer is exempt
         $sql = new DbQuery();
         $sql->select('rc.`captcha_disabled`');
         $sql->from(bqSQL(RecaptchaVisitor::$definition['table']), 'rc');
         $sql->where('rc.`email` = \''.pSQL($email).'\'');
         $val = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
-        if (is_array($val) && isset($val['captcha_disabled'])) {
-            if ($val['captcha_disabled']) {
-                return true;
-            }
-        } else {
-            if ((int) Configuration::get(static::ATTEMPTS) > 0) {
-                return true;
-            }
+        if (is_array($val) && isset($val['captcha_disabled']) && (int)$val['captcha_disabled']) {
+            return true;
         }
 
+        // check if group is exempt
         $sql = new DbQuery();
         $sql->select('g.`id_group`, rg.`captcha_disabled`');
         $sql->from('group', 'g');
@@ -2489,10 +2489,6 @@ class NoCaptchaRecaptcha extends Module
      */
     public function needsCaptcha($type = 'login', $email = null)
     {
-        if ($email && !Validate::isEmail($email)) {
-            return false;
-        }
-
         if (Configuration::get(static::PUBLIC_KEY) && Configuration::get(static::PRIVATE_KEY)) {
             switch ($type) {
                 case 'login':
@@ -2511,14 +2507,8 @@ class NoCaptchaRecaptcha extends Module
                     return (bool) Configuration::get(static::CREATE);
                 case 'contact':
                     if (Configuration::get(static::CONTACT)) {
-                        if ($this->hasExemption($email)) {
-                            return false;
-                        }
                         $cookieEmail = Context::getContext()->cookie->email;
-                        if ($cookieEmail != '' &&
-                            $email == $cookieEmail &&
-                            Configuration::get(static::LOGGEDINDISABLE)
-                        ) {
+                        if ($cookieEmail && $email === $cookieEmail && Configuration::get(static::LOGGEDINDISABLE)) {
                             return false;
                         } else {
                             return true;
