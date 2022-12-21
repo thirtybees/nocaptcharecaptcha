@@ -2639,7 +2639,7 @@ class NoCaptchaRecaptcha extends Module
      */
     protected function addOptionalOverride($classname, $source)
     {
-        $autoload = Autoload::getInstance();
+        $autoload = PrestaShopAutoload::getInstance();
 
         $origPath = $path = $autoload->getClassPath($classname.'Core');
         if (!$path) {
@@ -2820,7 +2820,7 @@ class NoCaptchaRecaptcha extends Module
      */
     public function removeOptionalOverride($classname, $source)
     {
-        $autoload = Autoload::getInstance();
+        $autoload = PrestaShopAutoload::getInstance();
 
         $origPath = $path = $autoload->getClassPath($classname.'Core');
         if (!$path) {
