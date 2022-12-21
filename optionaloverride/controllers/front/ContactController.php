@@ -19,6 +19,11 @@
 
 class ContactController extends ContactControllerCore
 {
+    /**
+     * @return void
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
     public function postProcess()
     {
         if (!Module::isEnabled('nocaptcharecaptcha')

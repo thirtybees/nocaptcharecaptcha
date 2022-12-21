@@ -19,6 +19,11 @@
 
 class PasswordController extends PasswordControllerCore
 {
+    /**
+     * @return void
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
     public function postProcess()
     {
         if (!Module::isEnabled('nocaptcharecaptcha')

@@ -29,8 +29,6 @@ class NocaptcharecaptchaCaptchaenabledModuleFrontController extends ModuleFrontC
     /**
      * NocaptcharecaptchaCaptchaenabledModuleFrontController constructor.
      *
-     * @throws Adapter_Exception
-     * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
     public function __construct()

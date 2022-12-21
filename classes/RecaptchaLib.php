@@ -55,6 +55,7 @@ namespace NoCaptchaRecaptchaModule;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 
 if (!defined('_TB_VERSION_')) {
     exit;
@@ -62,10 +63,21 @@ if (!defined('_TB_VERSION_')) {
 
 class RecaptchaLib
 {
+    /**
+     * @var string
+     */
     private static $signup_url = 'https://www.google.com/recaptcha/admin';
-    private static $siteVerifyUrl =
-        'https://www.google.com/recaptcha/api/siteverify?';
+    /**
+     * @var string
+     */
+    private static $siteVerifyUrl = 'https://www.google.com/recaptcha/api/siteverify?';
+    /**
+     * @var string
+     */
     private static $version = 'php_1.0';
+    /**
+     * @var string
+     */
     private $secret;
 
     /**
@@ -92,6 +104,7 @@ class RecaptchaLib
      * @param string $response response string from recaptcha verification.
      *
      * @return RecaptchaResponse
+     * @throws GuzzleException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -149,9 +162,10 @@ class RecaptchaLib
      * Submits an HTTP GET to a reCAPTCHA server.
      *
      * @param string $path url path to recaptcha server.
-     * @param array  $data array of parameters to be sent.
+     * @param array $data array of parameters to be sent.
      *
-     * @return array response
+     * @return string response
+     * @throws GuzzleException
      */
     private function submitHttpGet($path, $data)
     {

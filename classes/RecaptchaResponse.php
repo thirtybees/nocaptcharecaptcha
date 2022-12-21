@@ -62,6 +62,13 @@ if (!defined('_TB_VERSION_')) {
 */
 class RecaptchaResponse
 {
+    /**
+     * @var
+     */
     public $success;
+
+    /**
+     * @var
+     */
     public $error_codes;
 }

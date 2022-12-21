@@ -28,7 +28,6 @@ if (!defined('_TB_VERSION_')) {
  */
 class RecaptchaGroup extends \ObjectModel
 {
-    // @codingStandardsIgnoreStart
     /**
      * @see ObjectModel::$definition
      */
@@ -44,7 +43,6 @@ class RecaptchaGroup extends \ObjectModel
     public $id_group;
     /** @var bool $captchadisabled */
     public $captchadisabled;
-    // @codingStandardsIgnoreEnd
 
     /**
      * Enable recaptcha for the given range

@@ -19,6 +19,11 @@
 
 class AdminLoginController extends AdminLoginControllerCore
 {
+    /**
+     * @return void
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
     public function processLogin()
     {
         if (!Module::isEnabled('nocaptcharecaptcha')
@@ -66,6 +71,11 @@ class AdminLoginController extends AdminLoginControllerCore
         return parent::processLogin();
     }
 
+    /**
+     * @return void
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
     public function processForgot()
     {
         if (!Module::isEnabled('nocaptcharecaptcha')) {

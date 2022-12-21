@@ -28,7 +28,6 @@ if (!defined('_TB_VERSION_')) {
  */
 class RecaptchaVisitor extends \ObjectModel
 {
-    // @codingStandardsIgnoreStart
     /**
      * @see ObjectModel::$definition
      */
@@ -50,7 +49,6 @@ class RecaptchaVisitor extends \ObjectModel
     public $captcha_failed_attempt;
     /** @var int $captcha_attempts */
     public $captcha_attempts;
-    // @codingStandardsIgnoreEnd
 
     /**
      * Enable recaptcha for the given range

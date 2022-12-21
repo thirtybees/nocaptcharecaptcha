@@ -87,7 +87,9 @@ class NoCaptchaRecaptcha extends Module
     const MENU_CUSTOMERS = 3;
     const MENU_GROUPS = 4;
 
-    /** @var string $moduleUrl */
+    /**
+     * @var string $moduleUrl
+     */
     public $moduleUrl;
 
     /**
@@ -308,9 +310,10 @@ class NoCaptchaRecaptcha extends Module
      * Install Admin Login override
      *
      * @return void
-     * @throws Exception
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws ReflectionException
      */
     public function installAdminLoginOverride()
     {
@@ -416,13 +419,14 @@ class NoCaptchaRecaptcha extends Module
      * Manage the auth override
      * Automatically detects whether it should stay or should be removed
      *
-     * @param bool $login  Whether the login captcha should be enabled for the current shop
+     * @param bool $login Whether the login captcha should be enabled for the current shop
      * @param bool $create Whether the register captcha should be enable for the current shop
      *
      * @return bool
-     * @throws Exception
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws ReflectionException
      */
     public function manageAuthOverride($login, $create)
     {
@@ -493,9 +497,10 @@ class NoCaptchaRecaptcha extends Module
      * @param string $password Whether the password captcha should be enabled for this shop
      *
      * @return bool
-     * @throws Exception
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws ReflectionException
      */
     public function managePasswordOverride($password)
     {
@@ -552,9 +557,10 @@ class NoCaptchaRecaptcha extends Module
      * @param string $contact Whether the contact captcha should be enabled for this shop
      *
      * @return bool
-     * @throws Exception
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws ReflectionException
      */
     public function manageContactOverride($contact)
     {
@@ -605,7 +611,7 @@ class NoCaptchaRecaptcha extends Module
     }
 
     /**
-     * @return bool
+     * @return void
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      */
@@ -651,9 +657,10 @@ class NoCaptchaRecaptcha extends Module
      * Load the configuration form
      *
      * @return string
-     * @throws Exception
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws ReflectionException
      * @throws SmartyException
      */
     public function getContent()
@@ -754,7 +761,7 @@ class NoCaptchaRecaptcha extends Module
      * Render settings page
      *
      * @return string HTML
-     * @throws Exception
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws SmartyException
@@ -793,6 +800,9 @@ class NoCaptchaRecaptcha extends Module
      * Render advanced settings page
      *
      * @return string HTML
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     protected function renderAdvancedSettingsPage()
     {
@@ -813,6 +823,9 @@ class NoCaptchaRecaptcha extends Module
      * Render customer page
      *
      * @return string HTML
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     protected function renderCustomersPage()
     {
@@ -832,6 +845,9 @@ class NoCaptchaRecaptcha extends Module
      * Render group page
      *
      * @return string HTML
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     protected function renderGroupsPage()
     {
@@ -851,6 +867,11 @@ class NoCaptchaRecaptcha extends Module
 
     /**
      * Create the form that will be displayed in the configuration of your module.
+     *
+     * @return string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     protected function displayForm()
     {
@@ -1177,7 +1198,8 @@ class NoCaptchaRecaptcha extends Module
      *
      * @return string Advanced form HTML
      *
-     * @throws Exception
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      * @throws SmartyException
      */
     protected function displayAdvancedForm()
@@ -1238,6 +1260,8 @@ class NoCaptchaRecaptcha extends Module
 
     /**
      * Set values for the inputs.
+     * @return array
+     * @throws PrestaShopException
      */
     protected function getConfigFormValues()
     {
@@ -1276,6 +1300,8 @@ class NoCaptchaRecaptcha extends Module
      *
      * @return string
      * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     protected function renderCustomerList()
     {
@@ -1404,6 +1430,9 @@ class NoCaptchaRecaptcha extends Module
      * Render Customer export form
      *
      * @return string Form HTML
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     protected function renderCustomerEditForm()
     {
@@ -1493,6 +1522,8 @@ class NoCaptchaRecaptcha extends Module
      * @param int $idNoCaptchaRecaptchaVisitor NoCaptchaRecaptchaVisitor ID
      *
      * @return array Array with current values
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     protected function getCustomerValues($idNoCaptchaRecaptchaVisitor)
     {
@@ -1510,6 +1541,8 @@ class NoCaptchaRecaptcha extends Module
      *
      * @return string
      * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     protected function renderGroupList()
     {
@@ -1629,6 +1662,9 @@ class NoCaptchaRecaptcha extends Module
      * Render Group form
      *
      * @return string Form HTML
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     protected function renderGroupEditForm()
     {
@@ -1742,7 +1778,7 @@ class NoCaptchaRecaptcha extends Module
      * Save form data.
      *
      * @return void
-     * @throws Exception
+     *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
@@ -1780,6 +1816,7 @@ class NoCaptchaRecaptcha extends Module
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function ajaxProcess()
     {
@@ -1919,7 +1956,6 @@ class NoCaptchaRecaptcha extends Module
     /**
      * Post process settings form
      *
-     * @throws Exception
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
      * @throws ReflectionException
@@ -2152,7 +2188,7 @@ class NoCaptchaRecaptcha extends Module
      * Add the CSS & JavaScript files you want to be added on the FO.
      *
      * @return string
-     * @throws Exception
+     *
      * @throws PrestaShopException
      * @throws SmartyException
      */
@@ -2232,7 +2268,7 @@ class NoCaptchaRecaptcha extends Module
      * Add JS to back office
      *
      * @return string HTML
-     * @throws Exception
+     *
      * @throws PrestaShopException
      * @throws SmartyException
      */
@@ -2564,8 +2600,8 @@ class NoCaptchaRecaptcha extends Module
     /**
      * Get Tab name from database
      *
-     * @param $class string Class name of tab
-     * @param $lang  int Language id
+     * @param string $class Class name of tab
+     * @param int $lang Language id
      *
      * @return string Returns the localized tab name
      * @throws PrestaShopException
@@ -2592,7 +2628,7 @@ class NoCaptchaRecaptcha extends Module
      *
      * Replaces \n and \t with newline and tab resp.
      *
-     * @param $htmlString
+     * @param string $htmlString
      *
      * @return string  Unescaped HTML
      */
@@ -2605,9 +2641,10 @@ class NoCaptchaRecaptcha extends Module
      * Add all methods in a module override to the override class
      *
      * @param string $classname
+     * @param $source
      *
      * @return bool
-     * @throws Exception
+     * @throws ReflectionException
      */
     protected function addOptionalOverride($classname, $source)
     {
@@ -2784,9 +2821,11 @@ class NoCaptchaRecaptcha extends Module
      * Remove optional override
      *
      * @param string $classname Class name
-     * @param string $source    Source location of override
+     * @param string $source Source location of override
      *
      * @return bool
+     * @throws PrestaShopException
+     * @throws ReflectionException
      */
     public function removeOptionalOverride($classname, $source)
     {
@@ -2928,10 +2967,9 @@ class NoCaptchaRecaptcha extends Module
     /**
      * Update configuration value in ALL contexts
      *
-     * @param string $key    Configuration key
-     * @param mixed  $values Configuration values, can be string or array with id_lang as key
-     *
-     * @param bool   $html
+     * @param string $key Configuration key
+     * @param array|string $values Configuration values, can be string or array with id_lang as key
+     * @param string|false $html
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
@@ -2997,7 +3035,7 @@ class NoCaptchaRecaptcha extends Module
     /**
      * Check if the hideme class can be found
      *
-     * @param string $html Input HTML
+     * @param int $elements Input HTML
      * @param string $type The captcha type: login, create, password, contact
      *
      * @return bool Indicates whether there was an error
@@ -3047,7 +3085,7 @@ class NoCaptchaRecaptcha extends Module
      * @param int $listId            List ID
      * @param int $defaultPagination Default pagination value
      *
-     * @return mixed
+     * @return int
      */
     protected function getSelectedPagination($listId, $defaultPagination = 50)
     {
@@ -3063,7 +3101,7 @@ class NoCaptchaRecaptcha extends Module
      * @param int $listId    List ID
      * @param int $listTotal Total on list
      *
-     * @return int|mixed
+     * @return int
      */
     protected function getSelectedPage($listId, $listTotal)
     {
@@ -3086,15 +3124,15 @@ class NoCaptchaRecaptcha extends Module
     }
 
     /**
-     * @param $helperList
-     * @param $fieldsList
+     * @param HelperList $helperList
+     * @param array $fieldsList
      *
-     * @return array|string
-     * @throws ReflectionException
+     * @return string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     protected function getSQLFilter($helperList, $fieldsList)
     {
-        /** @var HelperList $helperList */
         if (!isset($helperList->list_id)) {
             $helperList->list_id = $helperList->table;
         }
@@ -3200,11 +3238,11 @@ class NoCaptchaRecaptcha extends Module
     }
 
     /**
-     * @param $fieldsList
-     * @param $key
-     * @param $filter
+     * @param array $fieldsList
+     * @param string $key
+     * @param string $filter
      *
-     * @return bool
+     * @return array|false
      */
     protected function filterToField($fieldsList, $key, $filter)
     {

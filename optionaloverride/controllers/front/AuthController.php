@@ -19,6 +19,11 @@
 
 class AuthController extends AuthControllerCore
 {
+    /**
+     * @return void
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
     public function processSubmitLogin()
     {
         if (!Module::isEnabled('nocaptcharecaptcha')
@@ -87,6 +92,12 @@ class AuthController extends AuthControllerCore
         return;
     }
 
+    /**
+     * @return void
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function processSubmitAccount()
     {
         if (!Module::isEnabled('nocaptcharecaptcha')) {
