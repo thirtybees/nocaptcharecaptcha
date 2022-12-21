@@ -2823,11 +2823,6 @@ class NoCaptchaRecaptcha extends Module
         $autoload = PrestaShopAutoload::getInstance();
 
         $origPath = $path = $autoload->getClassPath($classname.'Core');
-        if (!$path) {
-            $path = 'modules'.DIRECTORY_SEPARATOR.$classname.DIRECTORY_SEPARATOR.$classname.'.php';
-        }
-        $pathOverride = $source;
-        $origPath = $path = $autoload->getClassPath($classname.'Core');
         if ($origPath && !$file = $autoload->getClassPath($classname)) {
             return true;
         } elseif (!$origPath && Module::getModuleIdByName($classname)) {
@@ -2865,7 +2860,6 @@ class NoCaptchaRecaptcha extends Module
                 $method = $overrideClass->getMethod($method->getName());
                 $length = $method->getEndLine() - $method->getStartLine() + 1;
                 $moduleMethod = $moduleClass->getMethod($method->getName());
-                $moduleLength = $moduleMethod->getEndLine() - $moduleMethod->getStartLine() + 1;
                 $overrideFileOrig = $overrideFile;
                 $origContent = preg_replace('/\s/', '', implode('', array_splice($overrideFile, $method->getStartLine() - 1, $length, array_pad([], $length, '#--remove--#'))));
                 $moduleContent = preg_replace('/\s/', '', implode('', array_splice($moduleFile, $moduleMethod->getStartLine() - 1, $length, array_pad([], $length, '#--remove--#'))));
