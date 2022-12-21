@@ -376,7 +376,6 @@ class NoCaptchaRecaptcha extends Module
         }
         $this->updateAllValue(static::ADMINLOGIN, true);
 
-        return;
     }
 
     /**
@@ -412,7 +411,6 @@ class NoCaptchaRecaptcha extends Module
 
         $this->updateAllValue(static::ADMINLOGIN, false);
 
-        return;
     }
 
     /**
@@ -511,9 +509,7 @@ class NoCaptchaRecaptcha extends Module
                 _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'PasswordController.php'
             );
             if ($output) {
-                if ($password) {
-                    Configuration::updateValue(static::PASSWORD, true);
-                }
+                Configuration::updateValue(static::PASSWORD, true);
             } else {
                 $this->updateAllValue(static::PASSWORD, false);
             }
@@ -571,9 +567,7 @@ class NoCaptchaRecaptcha extends Module
                 _PS_MODULE_DIR_.$this->name.DIRECTORY_SEPARATOR.'optionaloverride'.DIRECTORY_SEPARATOR.'controllers'.DIRECTORY_SEPARATOR.'front'.DIRECTORY_SEPARATOR.'ContactController.php'
             );
             if ($output) {
-                if ($contact) {
-                    Configuration::updateValue(static::CONTACT, true);
-                }
+                Configuration::updateValue(static::CONTACT, true);
             } else {
                 $this->updateAllValue(static::CONTACT, false);
             }
@@ -1806,8 +1800,6 @@ class NoCaptchaRecaptcha extends Module
                 return;
             default:
                 $this->postProcessSettings();
-
-                return;
         }
     }
 
@@ -2113,7 +2105,7 @@ class NoCaptchaRecaptcha extends Module
                 } elseif (file_exists($this->local_path.'views/css/extra.css')) {
                     if (!@unlink($this->local_path.'views/css/extra.css')) {
                         $this->addError($this->l('Couldn\'t clear CSS file'), true);
-                    };
+                    }
                 }
             }
 
@@ -3064,7 +3056,7 @@ class NoCaptchaRecaptcha extends Module
     protected function updateHTMLValue($id, $type, $typeLang, $key)
     {
         $html = Tools::getValue($key);
-        if (empty($html) || empty($key) || empty($id) || empty($typeLang) || empty($id)) {
+        if (empty($html) || empty($key) || empty($id) || empty($typeLang)) {
             $this->addError(sprintf($this->l('There is no HTML for the %s captcha'), $typeLang), true);
 
             return;
