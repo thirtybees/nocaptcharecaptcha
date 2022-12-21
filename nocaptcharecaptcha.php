@@ -1376,10 +1376,10 @@ class NoCaptchaRecaptcha extends Module
         }
 
         if (Tools::isSubmit(RecaptchaVisitor::$definition['table'].'Orderway')) {
-            $helperList->orderWay = Tools::strtoupper(Tools::getValue(RecaptchaVisitor::$definition['table'].'Orderway'));
+            $helperList->orderWay = strtoupper(Tools::getValue(RecaptchaVisitor::$definition['table'].'Orderway'));
             $this->context->cookie->{RecaptchaVisitor::$definition['table'].'Orderway'} = Tools::getValue(RecaptchaVisitor::$definition['table'].'Orderway');
         } elseif (!empty($this->context->cookie->{RecaptchaVisitor::$definition['table'].'Orderway'})) {
-            $helperList->orderWay = Tools::strtoupper($this->context->cookie->{RecaptchaVisitor::$definition['table'].'Orderway'});
+            $helperList->orderWay = strtoupper($this->context->cookie->{RecaptchaVisitor::$definition['table'].'Orderway'});
         } else {
             $helperList->orderWay = 'DESC';
         }
@@ -1615,10 +1615,10 @@ class NoCaptchaRecaptcha extends Module
         }
 
         if (Tools::isSubmit(RecaptchaGroup::$definition['table'].'Orderway')) {
-            $helperList->orderWay = Tools::strtoupper(Tools::getValue(RecaptchaGroup::$definition['table'].'Orderway'));
+            $helperList->orderWay = strtoupper(Tools::getValue(RecaptchaGroup::$definition['table'].'Orderway'));
             $this->context->cookie->{RecaptchaGroup::$definition['table'].'Orderway'} = Tools::getValue(RecaptchaGroup::$definition['table'].'Orderway');
         } elseif (!empty($this->context->cookie->{RecaptchaGroup::$definition['table'].'Orderway'})) {
-            $helperList->orderWay = Tools::strtoupper($this->context->cookie->{RecaptchaGroup::$definition['table'].'Orderway'});
+            $helperList->orderWay = strtoupper($this->context->cookie->{RecaptchaGroup::$definition['table'].'Orderway'});
         } else {
             $helperList->orderWay = 'DESC';
         }
@@ -2240,7 +2240,7 @@ class NoCaptchaRecaptcha extends Module
                     'nocaptcharecaptcha_module_link'            => $this->context->link->getModuleLink($this->name, 'captchaenabled', [], true),
                     'nocaptcharecaptcha_guest_checkout_enabled' => (bool) Configuration::get('PS_GUEST_CHECKOUT_ENABLED'),
                     'nocaptcharecaptcha_show_at_start'          => !empty(Context::getContext()->cookie->email),
-                    'nocaptcharecaptcha_lang_iso'               => Tools::strtoupper(Tools::substr(Context::getContext()->language->language_code, 0, 2)),
+                    'nocaptcharecaptcha_lang_iso'               => strtoupper(substr(Context::getContext()->language->language_code, 0, 2)),
                 ]
             );
 
@@ -3169,8 +3169,8 @@ class NoCaptchaRecaptcha extends Module
 
         foreach ($filters as $key => $value) {
             /* Extracting filters from $_POST on key filter_ */
-            if ($value != null && !strncmp($key, $prefix.$helperList->list_id.'Filter_', 7 + Tools::strlen($prefix.$helperList->list_id))) {
-                $key = Tools::substr($key, 7 + Tools::strlen($prefix.$helperList->list_id));
+            if ($value != null && !strncmp($key, $prefix.$helperList->list_id.'Filter_', 7 + strlen($prefix.$helperList->list_id))) {
+                $key = substr($key, 7 + strlen($prefix.$helperList->list_id));
                 /* Table alias could be specified using a ! eg. alias!field */
                 $tempTab = explode('!', $key);
                 $filter = count($tempTab) > 1 ? $tempTab[1] : $tempTab[0];
@@ -3178,7 +3178,7 @@ class NoCaptchaRecaptcha extends Module
                 if ($field = $this->filterToField($fieldsList, $key, $filter)) {
                     $type = (array_key_exists('filter_type', $field) ? $field['filter_type'] : (array_key_exists('type', $field) ? $field['type'] : false));
                     if (($type == 'date' || $type == 'datetime') && is_string($value)) {
-                        $value = Tools::unSerialize($value);
+                        $value = unserialize($value);
                     }
                     $key = isset($tempTab[1]) ? $tempTab[0].'.`'.$tempTab[1].'`' : '`'.$tempTab[0].'`';
 
