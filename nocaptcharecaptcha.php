@@ -884,7 +884,7 @@ class NoCaptchaRecaptcha extends Module
 
         $helper->tpl_vars = [
             'fields_value' => $this->getConfigFormValues(),
-            'languages'    => $this->context->controller->getLanguages(),
+            'languages'    => $this->getHelperLanguages(),
             'id_language'  => $this->context->language->id,
         ];
 
@@ -1451,7 +1451,7 @@ class NoCaptchaRecaptcha extends Module
 
         $helper->tpl_vars = [
             'fields_value' => $this->getCustomerValues((int) Tools::getValue(RecaptchaVisitor::$definition['primary'])),
-            'languages'    => $this->context->controller->getLanguages(),
+            'languages'    => $this->getHelperLanguages(),
             'id_language'  => $this->context->language->id,
         ];
 
@@ -1683,7 +1683,7 @@ class NoCaptchaRecaptcha extends Module
 
         $helper->tpl_vars = [
             'fields_value' => $this->getGroupValues((int) Tools::getValue(RecaptchaGroup::$definition['primary'])),
-            'languages'    => $this->context->controller->getLanguages(),
+            'languages'    => $this->getHelperLanguages(),
             'id_language'  => $this->context->language->id,
         ];
 
@@ -3375,5 +3375,16 @@ class NoCaptchaRecaptcha extends Module
         }
 
         return (int) $context->shop->id;
+    }
+
+    /**
+     * @return array
+     * @throws PrestaShopException
+     */
+    protected function getHelperLanguages()
+    {
+        /** @var AdminController $controller */
+        $controller = $this->context->controller;
+        return $controller->getLanguages();
     }
 }
