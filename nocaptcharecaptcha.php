@@ -1816,7 +1816,6 @@ class NoCaptchaRecaptcha extends Module
      *
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function ajaxProcess()
     {

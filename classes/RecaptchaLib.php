@@ -54,7 +54,6 @@
 namespace NoCaptchaRecaptchaModule;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 
 if (!defined('_TB_VERSION_')) {
@@ -104,7 +103,6 @@ class RecaptchaLib
      * @param string $response response string from recaptcha verification.
      *
      * @return RecaptchaResponse
-     * @throws GuzzleException
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -165,14 +163,13 @@ class RecaptchaLib
      * @param array $data array of parameters to be sent.
      *
      * @return string response
-     * @throws GuzzleException
      */
     private function submitHttpGet($path, $data)
     {
         $req = $this->encodeQs($data);
         try {
-            $response = (string) (new Client(['verify' => _PS_TOOL_DIR_.'cacert.pem']))->get($path.$req)->getBody();
-        } catch (ClientException $e) {
+            $response = (string)(new Client(['verify' => _PS_TOOL_DIR_ . 'cacert.pem']))->get($path . $req)->getBody();
+        } catch (GuzzleException $e) {
             $response = '';
         }
 
