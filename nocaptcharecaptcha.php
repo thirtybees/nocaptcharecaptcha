@@ -2684,11 +2684,11 @@ class NoCaptchaRecaptcha extends Module
                 ];
             }
             $overrideFile = array_diff($overrideFile, ["\n"]);
-            eval(preg_replace(['#^\s*<\?(?:php)?#', '#class\s+'.$classname.'\s+extends\s+([a-z0-9_]+)(\s+implements\s+([a-z0-9_]+))?#i'], [' ', 'class '.$classname.'OverrideOriginal'.$uniq], implode('', $overrideFile)));
+            eval(preg_replace(['#^\s*<\?(?:php)?#', '#class\s+'.$classname.'\s+extends\s+([a-z0-9_]+)(\s+implements\s+([a-z0-9_]+))?#i'], [' ', 'class '.$classname.'OverrideOriginal'.$uniq.' extends \stdClass'], implode('', $overrideFile)));
             $overrideClass = new ReflectionClass($classname.'OverrideOriginal'.$uniq);
             $moduleFile = file($pathOverride);
             $moduleFile = array_diff($moduleFile, ["\n"]);
-            eval(preg_replace(['#^\s*<\?(?:php)?#', '#class\s+'.$classname.'(\s+extends\s+([a-z0-9_]+)(\s+implements\s+([a-z0-9_]+))?)?#i'], [' ', 'class '.$classname.'Override'.$uniq], implode('', $moduleFile)));
+            eval(preg_replace(['#^\s*<\?(?:php)?#', '#class\s+'.$classname.'(\s+extends\s+([a-z0-9_]+)(\s+implements\s+([a-z0-9_]+))?)?#i'], [' ', 'class '.$classname.'Override'.$uniq.' extends \stdClass'], implode('', $moduleFile)));
             $moduleClass = new ReflectionClass($classname.'Override'.$uniq);
             // Check if none of the methods already exists in the override class
             foreach ($moduleClass->getMethods() as $method) {
@@ -2771,7 +2771,7 @@ class NoCaptchaRecaptcha extends Module
                 do {
                     $uniq = uniqid();
                 } while (class_exists($classname.'OverrideOriginal_remove', false));
-                eval(preg_replace(['#^\s*<\?(?:php)?#', '#class\s+'.$classname.'(\s+extends\s+([a-z0-9_]+)(\s+implements\s+([a-z0-9_]+))?)?#i'], [' ', 'class '.$classname.'Override'.$uniq], implode('', $moduleFile)));
+                eval(preg_replace(['#^\s*<\?(?:php)?#', '#class\s+'.$classname.'(\s+extends\s+([a-z0-9_]+)(\s+implements\s+([a-z0-9_]+))?)?#i'], [' ', 'class '.$classname.'Override'.$uniq.' extends \stdClass'], implode('', $moduleFile)));
                 $moduleClass = new ReflectionClass($classname.'Override'.$uniq);
                 // For each method found in the override, prepend a comment with the module name and version
                 foreach ($moduleClass->getMethods() as $method) {
@@ -2852,10 +2852,10 @@ class NoCaptchaRecaptcha extends Module
             } while (class_exists($classname.'OverrideOriginal_remove', false));
             // Make a reflection of the override class and the module override class
             $overrideFile = file($overridePath);
-            eval(preg_replace(['#^\s*<\?(?:php)?#', '#class\s+'.$classname.'\s+extends\s+([a-z0-9_]+)(\s+implements\s+([a-z0-9_]+))?#i'], [' ', 'class '.$classname.'OverrideOriginal_remove'.$uniq], implode('', $overrideFile)));
+            eval(preg_replace(['#^\s*<\?(?:php)?#', '#class\s+'.$classname.'\s+extends\s+([a-z0-9_]+)(\s+implements\s+([a-z0-9_]+))?#i'], [' ', 'class '.$classname.'OverrideOriginal_remove'.$uniq.' extends \stdClass'], implode('', $overrideFile)));
             $overrideClass = new ReflectionClass($classname.'OverrideOriginal_remove'.$uniq);
             $moduleFile = file($source);
-            eval(preg_replace(['#^\s*<\?(?:php)?#', '#class\s+'.$classname.'(\s+extends\s+([a-z0-9_]+)(\s+implements\s+([a-z0-9_]+))?)?#i'], [' ', 'class '.$classname.'Override_remove'.$uniq], implode('', $moduleFile)));
+            eval(preg_replace(['#^\s*<\?(?:php)?#', '#class\s+'.$classname.'(\s+extends\s+([a-z0-9_]+)(\s+implements\s+([a-z0-9_]+))?)?#i'], [' ', 'class '.$classname.'Override_remove'.$uniq.' extends \stdClass'], implode('', $moduleFile)));
             $moduleClass = new ReflectionClass($classname.'Override_remove'.$uniq);
             // Remove methods from override file
             foreach ($moduleClass->getMethods() as $method) {
