@@ -3251,12 +3251,14 @@ class NoCaptchaRecaptcha extends Module
      */
     protected function addInformation($message, $private = true)
     {
+        /** @var AdminController $controller */
+        $controller = $this->context->controller;
         if (!Tools::isSubmit('configure')) {
             if (!$private) {
-                $this->context->controller->informations[] = '<a href="'.$this->moduleUrl.'">'.$this->displayName.': '.$message.'</a>';
+                $controller->informations[] = '<a href="'.$this->moduleUrl.'">'.$this->displayName.': '.$message.'</a>';
             }
         } else {
-            $this->context->controller->informations[] = $message;
+            $controller->informations[] = $message;
         }
     }
 
@@ -3268,12 +3270,14 @@ class NoCaptchaRecaptcha extends Module
      */
     protected function addConfirmation($message, $private = true)
     {
+        /** @var AdminController $controller */
+        $controller = $this->context->controller;
         if (!Tools::isSubmit('configure')) {
             if (!$private) {
-                $this->context->controller->confirmations[] = '<a href="'.$this->moduleUrl.'">'.$this->displayName.': '.$message.'</a>';
+                $controller->confirmations[] = '<a href="'.$this->moduleUrl.'">'.$this->displayName.': '.$message.'</a>';
             }
         } else {
-            $this->context->controller->confirmations[] = $message;
+            $controller->confirmations[] = $message;
         }
     }
 
@@ -3285,12 +3289,14 @@ class NoCaptchaRecaptcha extends Module
      */
     protected function addWarning($message, $private = true)
     {
+        /** @var AdminController $controller */
+        $controller = $this->context->controller;
         if (!Tools::isSubmit('configure')) {
             if (!$private) {
-                $this->context->controller->warnings[] = '<a href="'.$this->moduleUrl.'">'.$this->displayName.': '.$message.'</a>';
+                $controller->warnings[] = '<a href="'.$this->moduleUrl.'">'.$this->displayName.': '.$message.'</a>';
             }
         } else {
-            $this->context->controller->warnings[] = $message;
+            $controller->warnings[] = $message;
         }
     }
 
@@ -3301,12 +3307,14 @@ class NoCaptchaRecaptcha extends Module
      */
     protected function addError($message, $private = true)
     {
+        /** @var AdminController $controller */
+        $controller = $this->context->controller;
         if (!Tools::isSubmit('configure')) {
             if (!$private) {
-                $this->context->controller->errors[] = '<a href="'.$this->moduleUrl.'">'.$this->displayName.': '.$message.'</a>';
+                $controller->errors[] = '<a href="'.$this->moduleUrl.'">'.$this->displayName.': '.$message.'</a>';
             }
         } else {
-            $this->context->controller->errors[] = $message;
+            $controller->errors[] = $message;
         }
     }
 
