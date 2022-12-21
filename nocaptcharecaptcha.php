@@ -93,6 +93,11 @@ class NoCaptchaRecaptcha extends Module
     public $moduleUrl;
 
     /**
+     * @var int
+     */
+    public $menu;
+
+    /**
      * NoCaptchaRecaptcha constructor.
      *
      * @throws PrestaShopException
@@ -3103,9 +3108,7 @@ class NoCaptchaRecaptcha extends Module
             $page = $totalPages;
         }
 
-        $this->page = (int) $page;
-
-        return $page;
+        return (int)$page;
     }
 
     /**
