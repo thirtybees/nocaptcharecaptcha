@@ -2834,7 +2834,7 @@ class NoCaptchaRecaptcha extends Module
             $path = 'modules'.DIRECTORY_SEPARATOR.$classname.DIRECTORY_SEPARATOR.$classname.'.php';
         }
         // Check if override file is writable
-        if ($origPath) {
+        if ($origPath && isset($file)) {
             $overridePath = _PS_ROOT_DIR_.'/'.$file;
         } else {
             $overridePath = _PS_OVERRIDE_DIR_.$path;
@@ -2941,7 +2941,7 @@ class NoCaptchaRecaptcha extends Module
 
                 return false;
             }
-        } else {
+        } elseif (isset($code)) {
             if (@!file_put_contents($overridePath, $code)) {
                 $this->addError($this->l('Couldn\'t remove override(s). Make sure that the correct permissions are set on the folder /override and its contents.'), true);
 
