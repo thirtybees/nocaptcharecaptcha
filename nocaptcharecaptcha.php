@@ -106,7 +106,7 @@ class NoCaptchaRecaptcha extends Module
     {
         $this->name = 'nocaptcharecaptcha';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.3';
+        $this->version = '1.2.0';
         $this->author = 'thirty bees';
         $this->need_instance = 1;
 
@@ -238,6 +238,7 @@ class NoCaptchaRecaptcha extends Module
     protected $hooks = [
         'actionAuthentication',
         'displayBackOfficeHeader',
+        'actionRegisterCaptcha',
         'header',
     ];
 
@@ -3391,5 +3392,89 @@ class NoCaptchaRecaptcha extends Module
         /** @var AdminController $controller */
         $controller = $this->context->controller;
         return $controller->getLanguages();
+    }
+
+    /**
+     * @return array
+     */
+    public function hookActionRegisterCaptcha()
+    {
+        return [
+            'name' => $this->displayName,
+            'render' => [$this, 'callbackRenderCaptcha'],
+            'validate' => [$this, 'callbackValidateCaptcha']
+        ];
+    }
+
+    /**
+     * @param string $uniqueId
+     *
+     * @return string|null
+     *
+     * @throws PrestaShopException
+     * @throws SmartyException
+     */
+    public function callbackRenderCaptcha($uniqueId)
+    {
+        $publicKey = Configuration::get(static::PUBLIC_KEY);
+        if ($publicKey) {
+            $htmlId = md5($uniqueId);
+            $context = Context::getContext();
+            $context->smarty->assign([
+                'captchaUniqueId' => $uniqueId,
+                'captchaHtmlId' => $htmlId,
+                'captchaPublicKey' => Configuration::get(static::PUBLIC_KEY),
+                'captchaTheme' => 'light',
+                'languageIso' => $context->language->iso_code,
+            ]);
+            return $this->display(__FILE__, 'views/templates/front/hook-captcha.tpl');
+        }
+        return null;
+    }
+
+    /**
+     * @param string $uniqueId
+     *
+     * @return bool|string
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public function callbackValidateCaptcha($uniqueId)
+    {
+        $recaptchalib = new NoCaptchaRecaptchaModule\RecaptchaLib(Configuration::get('NCRC_PRIVATE_KEY'));
+        $resp = $recaptchalib->verifyResponse(Tools::getRemoteAddr(), Tools::getValue('g-recaptcha-response'));
+
+        if ($resp == null || !($resp->success)) {
+            if ($resp->error_codes[0] === 'invalid-input-secret') {
+                return Tools::displayError(
+                    Translate::getModuleTranslation(
+                        'nocaptcharecaptcha',
+                        'The reCAPTCHA secret key is invalid. Please contact the site administrator.',
+                        'configure'
+                    )
+                );
+            } elseif ($resp->error_codes[0] === 'google-no-contact') {
+                if (!Configuration::get('NCRC_GOOGLEIGNORE')) {
+                    return Tools::displayError(
+                        Translate::getModuleTranslation(
+                            'nocaptcharecaptcha',
+                            'Unable to connect to Google in order to verify the captcha. Please check your server settings or contact your hosting provider.',
+                            'configure'
+                        )
+                    );
+                }
+            } else {
+                return Tools::displayError(
+                    Translate::getModuleTranslation(
+                        'nocaptcharecaptcha',
+                        'Your captcha was wrong. Please try again.',
+                        'configure'
+                    )
+                );
+            }
+        }
+
+        return true;
     }
 }
